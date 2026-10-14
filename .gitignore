@@ -1,0 +1,32 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+.venv/
+env/
+venv/
+ENV/
+
+# Node
+node_modules/
+dist/
+.npm/
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local Media & Cache (Do not commit media libraries)
+media/
+videos/
+*.mp4
+*.mkv
+*.avi
+*.mov
+*.webm
+*.sqlite3
+*.db
