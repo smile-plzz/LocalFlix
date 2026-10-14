@@ -152,6 +152,58 @@ public class WindowsDriveService : IDriveService
         return mediaFile.FullPath;
     }
 
+    public const int WM_DEVICECHANGE = 0x0219;
+    public const int DBT_DEVICEARRIVAL = 0x8000;
+    public const int DBT_DEVICEREMOVECOMPLETE = 0x8004;
+
+    public IntPtr HandleWndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)
+    {
+        if (msg == WM_DEVICECHANGE)
+        {
+            var wp = wParam.ToInt32();
+            if (wp == DBT_DEVICEARRIVAL || wp == DBT_DEVICEREMOVECOMPLETE)
+            {
+                var isArrival = wp == DBT_DEVICEARRIVAL;
+                var currentDrives = GetConnectedDrives();
+                foreach (var d in currentDrives)
+                {
+                    DriveChanged?.Invoke(this, new DriveChangedEventArgs(d, isArrival));
+                }
+            }
+        }
+        return IntPtr.Zero;
+    }
+
+    public async Task SynchronizeDrivesAsync(ILibraryRepository repository)
+    {
+        var dbDrives = await repository.GetAllDrivesAsync();
+        var connected = GetConnectedDrives();
+
+        foreach (var dbDrive in dbDrives)
+        {
+            var match = connected.FirstOrDefault(c =>
+                c.VolumeGuid == dbDrive.VolumeGuid ||
+                (!string.IsNullOrEmpty(c.SerialNumber) && c.SerialNumber == dbDrive.SerialNumber));
+
+            if (match != null)
+            {
+                if (!dbDrive.IsConnected || dbDrive.LastKnownLetter != match.LastKnownLetter)
+                {
+                    await repository.UpdateDriveStatusAsync(dbDrive.Id, true, match.LastKnownLetter);
+                    DriveChanged?.Invoke(this, new DriveChangedEventArgs(match, true));
+                }
+            }
+            else
+            {
+                if (dbDrive.IsConnected)
+                {
+                    await repository.UpdateDriveStatusAsync(dbDrive.Id, false, dbDrive.LastKnownLetter);
+                    DriveChanged?.Invoke(this, new DriveChangedEventArgs(dbDrive, false));
+                }
+            }
+        }
+    }
+
     public void TriggerDriveChanged(Drive drive, bool isArrival)
     {
         DriveChanged?.Invoke(this, new DriveChangedEventArgs(drive, isArrival));

@@ -42,9 +42,36 @@ public partial class MainWindow : Window
         Loaded += MainWindow_Loaded;
     }
 
-    private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+    private async void MainWindow_Loaded(object sender, RoutedEventArgs e)
     {
         NavigateTo("Home");
+
+        try
+        {
+            var hwnd = new System.Windows.Interop.WindowInteropHelper(this).Handle;
+            var source = System.Windows.Interop.HwndSource.FromHwnd(hwnd);
+            if (_driveService is LocalFlix.Drives.WindowsDriveService winDrives)
+            {
+                source?.AddHook(winDrives.HandleWndProc);
+                winDrives.DriveChanged += async (s, args) =>
+                {
+                    await Dispatcher.InvokeAsync(async () =>
+                    {
+                        DriveStatusText.Text = args.IsArrival
+                            ? $"Drive Connected ({args.Drive.LastKnownLetter})"
+                            : "Drive Disconnected";
+                        if (_homeView != null) await _homeView.LoadDataAsync();
+                    });
+                };
+
+                await winDrives.SynchronizeDrivesAsync(_repository);
+                var connectedCount = winDrives.GetConnectedDrives().Count;
+                DriveStatusText.Text = $"Ready ({connectedCount} drives)";
+            }
+        }
+        catch
+        {
+        }
     }
 
     private void NavButton_Click(object sender, RoutedEventArgs e)

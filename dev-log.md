@@ -79,6 +79,19 @@
   - Clean build across all 8 projects.
 - **Status**: Completed.
 
+## [2026-10-14 15:05:00 +06:00] - Milestone 5: Drive Awareness Completed
+- **Task**: Implement volume GUID identification, drive letter resolution, live arrival/removal message hooks, and missing drive handling.
+- **Actions**:
+  - Implemented `WindowsDriveService` with Win32 `GetVolumeInformation` and `GetVolumeNameForVolumeMountPoint` to identify drives by volume GUID and serial number rather than volatile drive letters.
+  - Implemented dynamic path relinking in `ResolveFullPath`: searches across connected volumes to automatically resolve relative paths when drive letters change.
+  - Added Windows `WM_DEVICECHANGE` message hook (`DBT_DEVICEARRIVAL`, `DBT_DEVICEREMOVECOMPLETE`) in `MainWindow.xaml.cs` to update connected status live in the UI.
+  - Added database synchronization to reflect drive arrival and removal state without losing metadata, posters, or watch progress.
+  - Built `M5_DriveAwarenessTests` verifying volume GUID resolution, drive letter remapping, and disconnected drive status updates.
+- **Verification**:
+  - 62 tests passed (62/62 green).
+- **Status**: Completed.
+
+
 
 
 
