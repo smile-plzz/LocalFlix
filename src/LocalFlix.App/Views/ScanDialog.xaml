@@ -1,0 +1,57 @@
+<Window x:Class="LocalFlix.App.Views.ScanDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="Scan Media Library" Height="460" Width="640"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        Background="{StaticResource SurfaceDarkBrush}">
+    <Grid Margin="28">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,20">
+            <TextBlock Text="Scan Media Folder" Foreground="{StaticResource TextPrimaryBrush}" FontSize="20" FontWeight="Bold" Margin="0,0,0,6" />
+            <TextBlock Text="Select a drive or media directory to discover and index movies and series." Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" />
+        </StackPanel>
+
+        <!-- Folder Selection Input -->
+        <Grid Grid.Row="1" Margin="0,0,0,16">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBox x:Name="FolderPathBox" Grid.Column="0" Height="36" Background="{StaticResource BackgroundDarkBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="10,6" FontSize="13" VerticalContentAlignment="Center" />
+            <Button x:Name="BrowseButton" Grid.Column="1" Content="Browse..." Style="{StaticResource CinematicButton}" Margin="10,0,0,0" Padding="14,8" Click="BrowseButton_Click" />
+        </Grid>
+
+        <!-- Options & Progress -->
+        <StackPanel Grid.Row="2">
+            <CheckBox x:Name="SmartScanCheckBox" Content="Smart Scan: Discover candidate media folders across drive" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,16" />
+
+            <Border Background="{StaticResource BackgroundDarkBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="6" Padding="16" Margin="0,0,0,16">
+                <StackPanel>
+                    <TextBlock x:Name="StatusMessageText" Text="Waiting to start scan..." Foreground="{StaticResource TextPrimaryBrush}" FontSize="13" FontWeight="SemiBold" Margin="0,0,0,8" />
+                    <ProgressBar x:Name="ScanProgressBar" Height="6" Background="{StaticResource SurfaceHoverBrush}" Foreground="{StaticResource AccentRedBrush}" BorderThickness="0" Margin="0,0,0,10" IsIndeterminate="False" />
+                    <Grid>
+                        <TextBlock x:Name="CountsText" Text="Discovered: 0 | Matched: 0 | In Review: 0" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" HorizontalAlignment="Left" />
+                        <TextBlock x:Name="CurrentFileText" Text="" Foreground="#777788" FontSize="11" HorizontalAlignment="Right" TextTrimming="CharacterEllipsis" MaxWidth="280" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+
+        <!-- Bottom Actions -->
+        <Grid Grid.Row="3">
+            <Button x:Name="CancelButton" Content="Close" Style="{StaticResource CinematicButton}" HorizontalAlignment="Left" Padding="18,8" Click="CancelButton_Click" />
+            <Button x:Name="StartScanButton" Content="Start Scan" Style="{StaticResource AccentButton}" HorizontalAlignment="Right" Padding="22,8" Click="StartScanButton_Click" />
+        </Grid>
+    </Grid>
+</Window>

@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LocalFlix.App")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d9dadc0c0f0b22d666b9ca481686b05f47cf16d1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+671b0625931c57887e55fd0f6b96b9975266ea5f")]
 [assembly: System.Reflection.AssemblyProductAttribute("LocalFlix.App")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LocalFlix.App")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

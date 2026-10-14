@@ -1334,3 +1334,16 @@ C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug
 C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\LocalFlix.App.genruntimeconfig.cache
 C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\ref\LocalFlix.App.dll
 C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\App.baml
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\UserControls\TitleCardControl.baml
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\DetailView.baml
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\NeedsReviewView.baml
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\ScanDialog.baml
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\UserControls\TitleCardControl.g.cs
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\DetailView.g.cs
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\HomeView.g.cs
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\NeedsReviewView.g.cs
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\ScanDialog.g.cs
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\SearchView.g.cs
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\LocalFlix.App_MarkupCompile.lref
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\HomeView.baml
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\SearchView.baml

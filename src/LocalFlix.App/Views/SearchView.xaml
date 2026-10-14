@@ -1,0 +1,36 @@
+<UserControl x:Class="LocalFlix.App.Views.SearchView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:uc="clr-namespace:LocalFlix.App.UserControls"
+             mc:Ignorable="d"
+             Background="{StaticResource BackgroundDarkBrush}">
+    <Grid Margin="32">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <!-- Filters Header -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,24">
+            <TextBlock x:Name="SearchHeaderTitle" Text="Explore Library" Foreground="{StaticResource TextPrimaryBrush}" FontSize="24" FontWeight="Bold" Margin="0,0,0,16" />
+
+            <StackPanel Orientation="Horizontal">
+                <!-- Type Filter Chips -->
+                <Button x:Name="FilterAll" Content="All Types" Style="{StaticResource CinematicButton}" Tag="Active" Margin="0,0,8,0" Click="FilterButton_Click" />
+                <Button x:Name="FilterMovies" Content="Movies" Style="{StaticResource CinematicButton}" Margin="0,0,8,0" Click="FilterButton_Click" />
+                <Button x:Name="FilterSeries" Content="TV Series" Style="{StaticResource CinematicButton}" Margin="0,0,8,0" Click="FilterButton_Click" />
+                <Button x:Name="FilterDocs" Content="Documentaries" Style="{StaticResource CinematicButton}" Margin="0,0,16,0" Click="FilterButton_Click" />
+
+                <!-- Genre Filter -->
+                <ComboBox x:Name="GenreComboBox" Width="160" Background="{StaticResource SurfaceDarkBrush}" Foreground="{StaticResource TextPrimaryBrush}" SelectionChanged="GenreComboBox_SelectionChanged" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Results Grid -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <WrapPanel x:Name="ResultsWrapPanel" />
+        </ScrollViewer>
+    </Grid>
+</UserControl>

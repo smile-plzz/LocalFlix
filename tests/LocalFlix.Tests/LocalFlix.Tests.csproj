@@ -26,6 +26,7 @@
     <ProjectReference Include="..\..\src\LocalFlix.Metadata\LocalFlix.Metadata.csproj" />
     <ProjectReference Include="..\..\src\LocalFlix.Drives\LocalFlix.Drives.csproj" />
     <ProjectReference Include="..\..\src\LocalFlix.Playback\LocalFlix.Playback.csproj" />
+    <ProjectReference Include="..\..\src\LocalFlix.App\LocalFlix.App.csproj" />
   </ItemGroup>
 
 </Project>

@@ -49,4 +49,21 @@
   - 48 tests passed (48/48 green).
 - **Status**: Completed.
 
+## [2026-10-14 15:00:00 +06:00] - Milestone 3: Library UI Completed
+- **Task**: Implement streaming-platform style UI views (Home with Hero and horizontal rows, DetailView with season/episodes, SearchView with type/genre filters, NeedsReviewView, and ScanDialog).
+- **Actions**:
+  - Created `TitleCardControl` with poster artwork, rating badge, type chip, watch progress indicator, and disconnected drive overlay.
+  - Implemented `HomeView` with featured Hero banner, backdrop gradient overlay, and horizontal rows (Continue Watching, Recently Added, Movies, TV Shows, Documentaries).
+  - Implemented `DetailView` with backdrop header, poster, meta chips, watchlist toggle, overview, cast pill list, and series season/episode selector.
+  - Implemented `SearchView` with live search filtering across titles, directors, actors, and media type/genre chips.
+  - Implemented `NeedsReviewView` with candidate suggestion matching, confidence pill badges, and direct ID lookup.
+  - Implemented `ScanDialog` with folder browsing, smart scan option, real-time progress bar, and cancellation handling.
+  - Implemented `WindowsDriveService` for volume serial, label, and volume GUID resolution.
+  - Added `M3_UiTests` verifying ViewModel display formatting and badge logic.
+- **Verification**:
+  - 53 tests passed (53/53 green).
+  - UI builds with 0 errors and 0 warnings.
+- **Status**: Completed.
+
+
 

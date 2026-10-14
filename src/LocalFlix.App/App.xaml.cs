@@ -41,6 +41,10 @@ public partial class App : Application
         services.AddSingleton<IMediaClassifier, LocalFlix.Scanner.MediaClassifier>();
         services.AddSingleton<IFileScanner, LocalFlix.Scanner.FileScanner>();
 
+        // Metadata Orchestrator & Drive Service
+        services.AddSingleton<MetadataOrchestrator>();
+        services.AddSingleton<IDriveService, LocalFlix.Drives.WindowsDriveService>();
+
         services.AddSingleton<MainWindow>();
     }
 }

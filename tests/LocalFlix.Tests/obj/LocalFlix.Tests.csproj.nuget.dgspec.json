@@ -4,6 +4,117 @@
     "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\tests\\LocalFlix.Tests\\LocalFlix.Tests.csproj": {}
   },
   "projects": {
+    "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.App\\LocalFlix.App.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.App\\LocalFlix.App.csproj",
+        "projectName": "LocalFlix.App",
+        "projectPath": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.App\\LocalFlix.App.csproj",
+        "packagesPath": "C:\\Users\\ismai\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.App\\obj\\",
+        "projectStyle": "PackageReference",
+        "fallbackFolders": [
+          "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+        ],
+        "configFilePaths": [
+          "C:\\Users\\ismai\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config"
+        ],
+        "originalTargetFrameworks": [
+          "net9.0-windows"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {}
+        },
+        "frameworks": {
+          "net9.0-windows7.0": {
+            "targetAlias": "net9.0-windows",
+            "projectReferences": {
+              "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Core\\LocalFlix.Core.csproj": {
+                "projectPath": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Core\\LocalFlix.Core.csproj"
+              },
+              "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Data\\LocalFlix.Data.csproj": {
+                "projectPath": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Data\\LocalFlix.Data.csproj"
+              },
+              "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Drives\\LocalFlix.Drives.csproj": {
+                "projectPath": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Drives\\LocalFlix.Drives.csproj"
+              },
+              "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Metadata\\LocalFlix.Metadata.csproj": {
+                "projectPath": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Metadata\\LocalFlix.Metadata.csproj"
+              },
+              "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Playback\\LocalFlix.Playback.csproj": {
+                "projectPath": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Playback\\LocalFlix.Playback.csproj"
+              },
+              "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Scanner\\LocalFlix.Scanner.csproj": {
+                "projectPath": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Scanner\\LocalFlix.Scanner.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
+        },
+        "SdkAnalysisLevel": "9.0.300"
+      },
+      "frameworks": {
+        "net9.0-windows7.0": {
+          "targetAlias": "net9.0-windows",
+          "dependencies": {
+            "LibVLCSharp": {
+              "target": "Package",
+              "version": "[3.10.2, )"
+            },
+            "LibVLCSharp.WPF": {
+              "target": "Package",
+              "version": "[3.10.2, )"
+            },
+            "Microsoft.Extensions.DependencyInjection": {
+              "target": "Package",
+              "version": "[10.0.13, )"
+            },
+            "Microsoft.Extensions.Logging": {
+              "target": "Package",
+              "version": "[10.0.13, )"
+            },
+            "Microsoft.Extensions.Logging.Console": {
+              "target": "Package",
+              "version": "[10.0.13, )"
+            },
+            "VideoLAN.LibVLC.Windows": {
+              "target": "Package",
+              "version": "[3.0.24, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48",
+            "net481"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            },
+            "Microsoft.WindowsDesktop.App.WPF": {
+              "privateAssets": "none"
+            }
+          },
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.318/PortableRuntimeIdentifierGraph.json"
+        }
+      }
+    },
     "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Core\\LocalFlix.Core.csproj": {
       "version": "1.0.0",
       "restore": {
@@ -455,6 +566,9 @@
           "net9.0-windows7.0": {
             "targetAlias": "net9.0-windows",
             "projectReferences": {
+              "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.App\\LocalFlix.App.csproj": {
+                "projectPath": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.App\\LocalFlix.App.csproj"
+              },
               "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Core\\LocalFlix.Core.csproj": {
                 "projectPath": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Core\\LocalFlix.Core.csproj"
               },
