@@ -1,29 +1,30 @@
 # LocalFlix
 
-A lightweight, self-hosted local media streaming web application designed to organize, browse, and stream your personal video and movie collection directly through your browser.
+A native Windows desktop application that turns external hard drives full of movies, TV shows, and entertainment content into a sleek, streaming-platform style library with offline playback and automatic metadata enrichment.
 
-## Features (Planned)
-- **Local Directory Scanning**: Automatically discover video files (MP4, MKV, WebM, etc.).
-- **HTTP Video Streaming**: Support for HTML5 video playback with Range requests (seeking/scrubbing).
-- **Metadata & Posters**: Auto-fetch or display titles, duration, thumbnails, and file details.
-- **Modern Web Interface**: Responsive catalog grid, search/filter, and built-in media player.
+## Architecture & Tech Stack
+- Platform: Windows 10 (1809+) and Windows 11 (x64)
+- Framework: WPF on .NET 9.0 LTS with modern dark theme
+- Media Engine: LibVLCSharp (LibVLC) with hardware acceleration and extensive audio/subtitle codec support
+- Database: Embedded SQLite with versioned migrations
+- Metadata: TMDB API (primary details and artwork) + OMDb API (IMDb scores) with full offline disk caching
+- Drive Handling: Volume GUID and serial tracking for drive-letter agnostic relinking
 
-## Getting Started
+## Solution Structure
+- `LocalFlix.Core`: Pure domain models, contracts, and business rules.
+- `LocalFlix.Data`: SQLite persistence, migrations, and caching layers.
+- `LocalFlix.Scanner`: Directory crawling, filename parsing, and personal-video filtering.
+- `LocalFlix.Metadata`: TMDB/OMDb clients, fuzzy matching, and confidence scoring.
+- `LocalFlix.Playback`: LibVLC player abstraction, playback states, and track management.
+- `LocalFlix.Drives`: Volume GUID detection, device arrival/removal notifications.
+- `LocalFlix.App`: WPF user interface and dependency injection setup.
+- `LocalFlix.Tests`: Comprehensive unit and integration test suite.
 
-### Prerequisites
-- Python 3.10+ (or Node.js depending on chosen stack)
-
-### Setup
+## Building and Testing
 ```bash
-# Clone the repository
-git clone https://github.com/smile-plzz/LocalFlix.git
-cd LocalFlix
+# Build the entire solution
+dotnet build LocalFlix.sln
 
-# Installation instructions will be added based on the selected stack
-```
-
-## Usage
-```bash
-# Start the LocalFlix server
-python main.py
+# Run all test fixtures
+dotnet test LocalFlix.sln
 ```

@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "dgSpecHash": "ZbA72p2NsBU=",
+  "success": true,
+  "projectFilePath": "C:\\Users\\ismai\\.gemini\\antigravity\\scratch\\LocalFlix\\src\\LocalFlix.Playback\\LocalFlix.Playback.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\ismai\\.nuget\\packages\\libvlcsharp\\3.10.2\\libvlcsharp.3.10.2.nupkg.sha512",
+    "C:\\Users\\ismai\\.nuget\\packages\\libvlcsharp.wpf\\3.10.2\\libvlcsharp.wpf.3.10.2.nupkg.sha512",
+    "C:\\Users\\ismai\\.nuget\\packages\\videolan.libvlc.windows\\3.0.24\\videolan.libvlc.windows.3.0.24.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,16 @@
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\bin\Debug\net9.0\LocalFlix.Scanner.deps.json
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\bin\Debug\net9.0\LocalFlix.Scanner.dll
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\bin\Debug\net9.0\LocalFlix.Scanner.pdb
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\bin\Debug\net9.0\LocalFlix.Core.dll
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\bin\Debug\net9.0\LocalFlix.Core.pdb
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\obj\Debug\net9.0\LocalFlix.Scanner.csproj.AssemblyReference.cache
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\obj\Debug\net9.0\LocalFlix.Scanner.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\obj\Debug\net9.0\LocalFlix.Scanner.AssemblyInfoInputs.cache
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\obj\Debug\net9.0\LocalFlix.Scanner.AssemblyInfo.cs
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\obj\Debug\net9.0\LocalFlix.Scanner.csproj.CoreCompileInputs.cache
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\obj\Debug\net9.0\LocalFlix.Scanner.sourcelink.json
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\obj\Debug\net9.0\LocalFli.E15DAC52.Up2Date
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\obj\Debug\net9.0\LocalFlix.Scanner.dll
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\obj\Debug\net9.0\refint\LocalFlix.Scanner.dll
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\obj\Debug\net9.0\LocalFlix.Scanner.pdb
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.Scanner\obj\Debug\net9.0\ref\LocalFlix.Scanner.dll

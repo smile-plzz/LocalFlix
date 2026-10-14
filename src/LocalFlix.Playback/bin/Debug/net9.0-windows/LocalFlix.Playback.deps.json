@@ -1,0 +1,83 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "LocalFlix.Playback/1.0.0": {
+        "dependencies": {
+          "LibVLCSharp": "3.10.2",
+          "LibVLCSharp.WPF": "3.10.2",
+          "LocalFlix.Core": "1.0.0",
+          "VideoLAN.LibVLC.Windows": "3.0.24"
+        },
+        "runtime": {
+          "LocalFlix.Playback.dll": {}
+        }
+      },
+      "LibVLCSharp/3.10.2": {
+        "runtime": {
+          "lib/net9.0/LibVLCSharp.dll": {
+            "assemblyVersion": "3.10.2.0",
+            "fileVersion": "3.10.2.0"
+          }
+        }
+      },
+      "LibVLCSharp.WPF/3.10.2": {
+        "dependencies": {
+          "LibVLCSharp": "3.10.2"
+        },
+        "runtime": {
+          "lib/net6.0-windows7.0/LibVLCSharp.WPF.dll": {
+            "assemblyVersion": "3.10.2.0",
+            "fileVersion": "3.10.2.0"
+          }
+        }
+      },
+      "VideoLAN.LibVLC.Windows/3.0.24": {},
+      "LocalFlix.Core/1.0.0": {
+        "runtime": {
+          "LocalFlix.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "LocalFlix.Playback/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LibVLCSharp/3.10.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-WNLHBIK5QcOH0kNGBGupKC9Ds3hksPthHyp6ueE8zG5Hy/6EBwAU0BbMqukBCdLatCOY+V9DYHDwSVSXSmPGSA==",
+      "path": "libvlcsharp/3.10.2",
+      "hashPath": "libvlcsharp.3.10.2.nupkg.sha512"
+    },
+    "LibVLCSharp.WPF/3.10.2": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-jV7ThQIwaQxuLPLNWb1z7+qOGh6ctg/lBF5hVPfu+s+xI5HvtFEvCiYb8a88rEEd/g5WI/Llhy7ipeicAL5gsw==",
+      "path": "libvlcsharp.wpf/3.10.2",
+      "hashPath": "libvlcsharp.wpf.3.10.2.nupkg.sha512"
+    },
+    "VideoLAN.LibVLC.Windows/3.0.24": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-U8SHuJr8eAC3x4+gEtOJD2heReo0tTWP3v21NunYNTzjmHpVp7qELs8phohqazxHMkaSIN8LufdIpAhldiLL/A==",
+      "path": "videolan.libvlc.windows/3.0.24",
+      "hashPath": "videolan.libvlc.windows.3.0.24.nupkg.sha512"
+    },
+    "LocalFlix.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

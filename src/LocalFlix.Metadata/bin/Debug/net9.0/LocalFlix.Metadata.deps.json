@@ -1,0 +1,39 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v9.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v9.0": {
+      "LocalFlix.Metadata/1.0.0": {
+        "dependencies": {
+          "LocalFlix.Core": "1.0.0"
+        },
+        "runtime": {
+          "LocalFlix.Metadata.dll": {}
+        }
+      },
+      "LocalFlix.Core/1.0.0": {
+        "runtime": {
+          "LocalFlix.Core.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "LocalFlix.Metadata/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "LocalFlix.Core/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
