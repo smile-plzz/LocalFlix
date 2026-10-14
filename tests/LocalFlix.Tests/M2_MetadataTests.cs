@@ -23,8 +23,14 @@ public class M2_MetadataTests : IDisposable
 
         _repository = new SqliteLibraryRepository(_tempDbPath);
         _fakeProvider = new FakeMetadataProvider();
-        _imageCache = new ImageCacheService(Path.Combine(Path.GetTempPath(), $"LocalFlix_ImgCache_{Guid.NewGuid():N}"));
+        _imageCache = new ImageCacheService(Path.Combine(Path.GetTempPath(), $"LocalFlix_ImgCache_{Guid.NewGuid():N}"), new System.Net.Http.HttpClient(new OfflineImageHandler()));
         _orchestrator = new MetadataOrchestrator(_repository, _imageCache, _fakeProvider);
+    }
+
+    private sealed class OfflineImageHandler : System.Net.Http.HttpMessageHandler
+    {
+        protected override Task<System.Net.Http.HttpResponseMessage> SendAsync(System.Net.Http.HttpRequestMessage request, CancellationToken cancellationToken)
+            => Task.FromResult(new System.Net.Http.HttpResponseMessage(System.Net.HttpStatusCode.NotFound));
     }
 
     public void Dispose()

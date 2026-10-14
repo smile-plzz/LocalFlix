@@ -72,8 +72,7 @@ public class WindowsDriveService : IDriveService
             return sb.ToString();
         }
 
-        // Fallback to normalized drive root if volume GUID unavailable
-        return $@"\\?\Volume{{{root.Replace(":", "").Replace("\\", "")}}}\";
+        throw new IOException("Cannot determine a stable volume identity. Reconnect the drive and try again.");
     }
 
     public string GetVolumeSerialForPath(string path)
@@ -114,16 +113,7 @@ public class WindowsDriveService : IDriveService
 
     public string? ResolveFullPath(Drive drive, string relativePath)
     {
-        // First check current known letter
-        if (!string.IsNullOrEmpty(drive.LastKnownLetter))
-        {
-            var full = Path.Combine(drive.LastKnownLetter, relativePath);
-            if (File.Exists(full) || Directory.Exists(full))
-            {
-                return full;
-            }
-        }
-
+        if (Path.IsPathRooted(relativePath) || relativePath.Split('\\', '/').Contains("..")) return null;
         // If letter changed, search across all currently connected drives by Volume GUID or Serial
         foreach (var d in DriveInfo.GetDrives())
         {
@@ -133,7 +123,7 @@ public class WindowsDriveService : IDriveService
             var currentGuid = GetVolumeGuidForPath(currentRoot);
             var currentSerial = GetVolumeSerialForPath(currentRoot);
 
-            if (currentGuid == drive.VolumeGuid || (currentSerial == drive.SerialNumber && !string.IsNullOrEmpty(drive.SerialNumber)))
+            if (SameVolume(drive, currentGuid, currentSerial))
             {
                 drive.LastKnownLetter = currentRoot;
                 drive.IsConnected = true;
@@ -164,11 +154,7 @@ public class WindowsDriveService : IDriveService
             if (wp == DBT_DEVICEARRIVAL || wp == DBT_DEVICEREMOVECOMPLETE)
             {
                 var isArrival = wp == DBT_DEVICEARRIVAL;
-                var currentDrives = GetConnectedDrives();
-                foreach (var d in currentDrives)
-                {
-                    DriveChanged?.Invoke(this, new DriveChangedEventArgs(d, isArrival));
-                }
+                DriveChanged?.Invoke(this, new DriveChangedEventArgs(new Drive(), isArrival));
             }
         }
         return IntPtr.Zero;
@@ -182,15 +168,14 @@ public class WindowsDriveService : IDriveService
         foreach (var dbDrive in dbDrives)
         {
             var match = connected.FirstOrDefault(c =>
-                c.VolumeGuid == dbDrive.VolumeGuid ||
-                (!string.IsNullOrEmpty(c.SerialNumber) && c.SerialNumber == dbDrive.SerialNumber));
+                SameVolume(dbDrive, c.VolumeGuid, c.SerialNumber));
 
             if (match != null)
             {
                 if (!dbDrive.IsConnected || dbDrive.LastKnownLetter != match.LastKnownLetter)
                 {
                     await repository.UpdateDriveStatusAsync(dbDrive.Id, true, match.LastKnownLetter);
-                    DriveChanged?.Invoke(this, new DriveChangedEventArgs(match, true));
+
                 }
             }
             else
@@ -198,10 +183,20 @@ public class WindowsDriveService : IDriveService
                 if (dbDrive.IsConnected)
                 {
                     await repository.UpdateDriveStatusAsync(dbDrive.Id, false, dbDrive.LastKnownLetter);
-                    DriveChanged?.Invoke(this, new DriveChangedEventArgs(dbDrive, false));
+
                 }
             }
         }
+    }
+
+    public static bool SameVolume(Drive stored, string guid, string serial)
+    {
+        if (!string.IsNullOrWhiteSpace(stored.VolumeGuid) && !string.IsNullOrWhiteSpace(guid))
+            return string.Equals(stored.VolumeGuid, guid, StringComparison.OrdinalIgnoreCase)
+                && (string.IsNullOrEmpty(stored.SerialNumber) || stored.SerialNumber == "SN-UNKNOWN"
+                    || string.Equals(stored.SerialNumber, serial, StringComparison.OrdinalIgnoreCase));
+        return !string.IsNullOrEmpty(serial) && serial != "SN-UNKNOWN"
+            && string.Equals(serial, stored.SerialNumber, StringComparison.OrdinalIgnoreCase);
     }
 
     public void TriggerDriveChanged(Drive drive, bool isArrival)

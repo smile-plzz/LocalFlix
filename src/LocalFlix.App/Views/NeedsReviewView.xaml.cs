@@ -201,9 +201,10 @@ public partial class NeedsReviewView : UserControl
         };
         Grid.SetColumn(idInput, 0);
 
+        idInput.ToolTip = "Enter a title to search, a TMDB numeric ID, or an IMDb ID beginning tt";
         var matchIdBtn = new Button
         {
-            Content = "Apply ID",
+            Content = "Search / Apply ID",
             Style = (Style)FindResource("AccentButton"),
             Padding = new Thickness(14, 6, 14, 6),
             FontSize = 12,
@@ -217,11 +218,24 @@ public partial class NeedsReviewView : UserControl
             {
                 try
                 {
+                    var type = new LocalFlix.Scanner.FilenameParser().Parse(System.IO.Path.GetFileName(file?.RelativePath ?? "")).InferredType;
+                    if (!enteredId.StartsWith("tt", StringComparison.OrdinalIgnoreCase) && !long.TryParse(enteredId, out _))
+                    {
+                        var matches = await _primaryProvider.SearchAsync(enteredId, mediaType: type);
+                        await _repository.UpsertReviewItemAsync(new ReviewItem
+                        {
+                            MediaFileId = item.MediaFileId,
+                            Reason = matches.Count == 0 ? "No results. Check API keys or try another title." : "Choose the correct match below.",
+                            CandidateMatchesJson = JsonSerializer.Serialize(matches.Select(c => new { c.Id, c.Title, c.Year, Type = c.Type.ToString(), c.ConfidenceScore }))
+                        });
+                        await LoadReviewItemsAsync();
+                        return;
+                    }
                     await _orchestrator.ApplyManualMatchAsync(
                         item.MediaFileId,
                         enteredId,
                         _primaryProvider,
-                        MediaType.Movie,
+                        type,
                         item.Id);
                     await LoadReviewItemsAsync();
                     ReviewResolved?.Invoke(this, EventArgs.Empty);

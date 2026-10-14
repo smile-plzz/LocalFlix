@@ -20,6 +20,7 @@ public interface ILibraryRepository
 
     // Titles
     Task<TitleItem?> GetTitleByIdAsync(int id);
+    Task<TitleItem?> GetTitleByMediaFileIdAsync(int mediaFileId);
     Task<IReadOnlyList<TitleItem>> GetAllTitlesAsync(MediaType? filterType = null);
     Task<IReadOnlyList<TitleItem>> SearchTitlesAsync(string query, MediaType? filterType = null, string? genre = null);
     Task<IReadOnlyList<TitleItem>> GetRecentlyAddedTitlesAsync(int count = 20);

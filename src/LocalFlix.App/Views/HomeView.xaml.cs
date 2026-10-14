@@ -106,9 +106,10 @@ public partial class HomeView : UserControl
                 PosterPath = item.PosterPath,
                 BackdropPath = item.BackdropPath,
                 Type = item.Type,
-                IsDriveConnected = true
+                IsDriveConnected = false
             };
 
+            _ = UpdateAvailabilityAsync(vm, item);
             var card = new TitleCardControl { Item = vm };
             card.CardClicked += (s, clickedVm) =>
             {
@@ -118,6 +119,18 @@ public partial class HomeView : UserControl
 
             targetPanel.Children.Add(card);
         }
+    }
+
+    private async Task UpdateAvailabilityAsync(TitleCardViewModel vm, TitleItem item)
+    {
+        if (!item.MediaFileId.HasValue) return;
+        var file = await _repository.GetMediaFileByIdAsync(item.MediaFileId.Value);
+        if (file == null) return;
+        var drive = await _repository.GetDriveByIdAsync(file.DriveId);
+        vm.IsDriveConnected = drive?.IsConnected == true;
+        var progress = await _repository.GetPlaybackStateAsync(file.Id);
+        if (progress != null && progress.DurationSeconds > 0)
+            vm.ProgressPercentage = 100 * progress.PositionSeconds / progress.DurationSeconds;
     }
 
     private void HeroPlayBtn_Click(object sender, RoutedEventArgs e)

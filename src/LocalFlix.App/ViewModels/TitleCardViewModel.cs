@@ -31,8 +31,10 @@ public class TitleCardViewModel : ViewModelBase
     public string? PosterPath { get; init; }
     public string? BackdropPath { get; init; }
     public MediaType Type { get; init; }
-    public bool IsDriveConnected { get; init; } = true;
-    public double ProgressPercentage { get; init; }
+    private bool _isDriveConnected = true;
+    public bool IsDriveConnected { get => _isDriveConnected; set => SetField(ref _isDriveConnected, value); }
+    private double _progressPercentage;
+    public double ProgressPercentage { get => _progressPercentage; set => SetField(ref _progressPercentage, value); }
 
     public string DisplayYear => Year.HasValue ? Year.Value.ToString() : string.Empty;
     public string DisplayRating => Rating.HasValue ? $"★ {Rating.Value:0.0}" : string.Empty;

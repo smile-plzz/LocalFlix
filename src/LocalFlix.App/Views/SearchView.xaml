@@ -26,6 +26,11 @@
                 <!-- Genre Filter -->
                 <ComboBox x:Name="GenreComboBox" Width="160" Background="{StaticResource SurfaceDarkBrush}" Foreground="{StaticResource TextPrimaryBrush}" SelectionChanged="GenreComboBox_SelectionChanged" />
             </StackPanel>
+            <StackPanel Orientation="Horizontal" Margin="0,16,0,0">
+                <Button x:Name="PreviousPage" Content="Previous" Click="PreviousPage_Click" Style="{StaticResource CinematicButton}" />
+                <TextBlock x:Name="PageLabel" Margin="16,0" VerticalAlignment="Center" Foreground="{StaticResource TextSecondaryBrush}" />
+                <Button x:Name="NextPage" Content="Next" Click="NextPage_Click" Style="{StaticResource CinematicButton}" />
+            </StackPanel>
         </StackPanel>
 
         <!-- Results Grid -->

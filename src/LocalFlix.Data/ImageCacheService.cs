@@ -57,9 +57,16 @@ public class ImageCacheService : IImageCacheService
             }
 
             var bytes = await _httpClient.GetByteArrayAsync(imageUrl, cancellationToken);
-            await File.WriteAllBytesAsync(filePath, bytes, cancellationToken);
+            var temporary = filePath + "." + Guid.NewGuid().ToString("N") + ".tmp";
+            try
+            {
+                await File.WriteAllBytesAsync(temporary, bytes, cancellationToken);
+                File.Move(temporary, filePath, true);
+            }
+            finally { if (File.Exists(temporary)) File.Delete(temporary); }
             return filePath;
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch
         {
             // If offline or download fails, return null so UI can fallback to placeholder

@@ -157,7 +157,8 @@ public partial class FilenameParser : IFilenameParser
         }
         else
         {
-            cleanTitle = rawName;
+            var tag = Regex.Match(rawName, @"[ ._\[]+(?:2160p|1080[pi]|720p|480p|WEB-DL|WEBRip|BluRay|BDRip|HDTV|x264|x265|HEVC)(?:[ ._\]\-]|$)", RegexOptions.IgnoreCase);
+            cleanTitle = tag.Success ? rawName[..tag.Index] : rawName;
         }
 
         cleanTitle = NormalizeTitle(cleanTitle);
@@ -206,7 +207,7 @@ public partial class FilenameParser : IFilenameParser
         title = Regex.Replace(title, @"[\._\+]+", " ");
 
         // Remove release group suffixes at end like "-SPARKS", "-YIFY"
-        title = Regex.Replace(title, @"\s*-[a-zA-Z0-9_]+$", "");
+        title = Regex.Replace(title, @"\s*-(?:SPARKS|YIFY|RARBG|YTS|ETRG|EVO)$", "");
 
         // Remove trailing hyphens or noise
         title = Regex.Replace(title, @"[\s\-]+$", "");

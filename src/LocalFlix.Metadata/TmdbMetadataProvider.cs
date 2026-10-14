@@ -8,14 +8,15 @@ namespace LocalFlix.Metadata;
 public class TmdbMetadataProvider : IMetadataProvider
 {
     private readonly HttpClient _httpClient;
-    private readonly string? _apiKey;
+    private readonly string? _configuredApiKey;
+    private string? _apiKey => _configuredApiKey ?? Environment.GetEnvironmentVariable("TMDB_API_KEY", EnvironmentVariableTarget.User) ?? Environment.GetEnvironmentVariable("TMDB_API_KEY");
 
     public string ProviderName => "TheMovieDatabase";
 
     public TmdbMetadataProvider(HttpClient? httpClient = null, string? apiKey = null)
     {
         _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-        _apiKey = apiKey ?? Environment.GetEnvironmentVariable("TMDB_API_KEY");
+        _configuredApiKey = apiKey;
     }
 
     public async Task<IReadOnlyList<MetadataSearchResult>> SearchAsync(
@@ -85,6 +86,7 @@ public class TmdbMetadataProvider : IMetadataProvider
 
             return list.OrderByDescending(r => r.ConfidenceScore).ToList();
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch
         {
             return Array.Empty<MetadataSearchResult>();
@@ -158,8 +160,8 @@ public class TmdbMetadataProvider : IMetadataProvider
                 if (credits.TryGetProperty("crew", out var crew))
                 {
                     director = crew.EnumerateArray()
-                        .FirstOrDefault(x => x.TryGetProperty("job", out var job) && job.GetString() == "Director")
-                        .GetProperty("name").GetString();
+                        .Where(x => x.TryGetProperty("job", out var job) && job.GetString() == "Director")
+                        .Select(x => x.GetProperty("name").GetString()).FirstOrDefault();
                 }
 
                 if (credits.TryGetProperty("cast", out var castArray))
@@ -188,6 +190,7 @@ public class TmdbMetadataProvider : IMetadataProvider
                 Type = endpoint == "movie" ? MediaType.Movie : MediaType.TvShow
             };
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch
         {
             return null;

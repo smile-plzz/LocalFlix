@@ -4,7 +4,7 @@
 LocalFlix is a native Windows application that transforms external hard drives containing movies, TV shows, and documentaries into a cinematic, streaming-style library with offline playback and an optional online streaming module in phase 2.
 
 ## Core Architectural Decisions
-- Application Framework: WPF (.NET 9.0 LTS) with modern cinematic dark styling.
+- Application Framework: WPF (.NET 9.0) with modern cinematic dark styling.
 - Media Engine: LibVLCSharp / LibVLC for full codec (MKV, HEVC, AC3, DTS, ASS/SRT subtitles) and hardware-accelerated playback.
 - Database: SQLite (via Microsoft.Data.Sqlite / Dapper) stored in LocalAppData with versioned migrations and automatic backups.
 - Metadata: TMDB as primary provider (posters, backdrops, cast, overview, IDs), OMDb for IMDb ratings.
@@ -35,3 +35,6 @@ LocalFlix.sln
 - M6: Polish and packaging (Settings, error states, performance pass, installer, icon)
 - v1.0: Offline release
 - M7 & M8: Online streaming module (Phase 2)
+
+## Current handoff
+See `docs/RELEASE-READINESS.md` for the verified implementation status. Offline release acceptance is still pending; do not start phase 2.

@@ -45,6 +45,7 @@
 
                     <CheckBox x:Name="HardwareAccToggle" Content="Enable Hardware Accelerated Video Decoding (GPU)" IsChecked="True" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,12" />
                     <CheckBox x:Name="AutoPlayNextToggle" Content="Auto-play next episode with 10s countdown" IsChecked="True" Foreground="{StaticResource TextPrimaryBrush}" />
+                    <Button Content="Save Playback Preferences" Style="{StaticResource CinematicButton}" HorizontalAlignment="Left" Margin="0,16,0,0" Click="SavePlaybackButton_Click" />
                 </StackPanel>
             </Border>
 
