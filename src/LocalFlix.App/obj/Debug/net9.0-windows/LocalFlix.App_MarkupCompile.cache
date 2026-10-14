@@ -10,11 +10,11 @@ none
 false
 TRACE;DEBUG;NET;NET9_0;NETCOREAPP;WINDOWS;WINDOWS7_0;NET5_0_OR_GREATER;NET6_0_OR_GREATER;NET7_0_OR_GREATER;NET8_0_OR_GREATER;NET9_0_OR_GREATER;NETCOREAPP3_0_OR_GREATER;NETCOREAPP3_1_OR_GREATER;WINDOWS7_0_OR_GREATER
 C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\App.xaml
-7-1028750680
+8777720561
 1253-2034278882
-11-451285015
+12228375324
 225-1232238167
-MainWindow.xaml;UserControls\TitleCardControl.xaml;Views\DetailView.xaml;Views\HomeView.xaml;Views\NeedsReviewView.xaml;Views\ScanDialog.xaml;Views\SearchView.xaml;
+MainWindow.xaml;UserControls\TitleCardControl.xaml;Views\DetailView.xaml;Views\HomeView.xaml;Views\NeedsReviewView.xaml;Views\PlayerWindow.xaml;Views\ScanDialog.xaml;Views\SearchView.xaml;
 
 False
 

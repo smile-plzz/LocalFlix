@@ -1347,3 +1347,5 @@ C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug
 C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\LocalFlix.App_MarkupCompile.lref
 C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\HomeView.baml
 C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\SearchView.baml
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\PlayerWindow.baml
+C:\Users\ismai\.gemini\antigravity\scratch\LocalFlix\src\LocalFlix.App\obj\Debug\net9.0-windows\Views\PlayerWindow.g.cs

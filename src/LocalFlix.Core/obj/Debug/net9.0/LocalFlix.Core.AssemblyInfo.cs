@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LocalFlix.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+671b0625931c57887e55fd0f6b96b9975266ea5f")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+54492854733b95691fb1b4201ee35b452441a182")]
 [assembly: System.Reflection.AssemblyProductAttribute("LocalFlix.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LocalFlix.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

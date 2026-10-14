@@ -167,14 +167,77 @@ public partial class MainWindow : Window
         MainContentHost.Content = detailView;
     }
 
-    private void OnPlayTitle(TitleItem title)
+    private async void OnPlayTitle(TitleItem title)
     {
-        // Handled in M4 (Playback)
+        if (!title.MediaFileId.HasValue)
+        {
+            MessageBox.Show("No media file linked to this title.", "Playback Error", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var file = await _repository.GetMediaFileByIdAsync(title.MediaFileId.Value);
+        if (file == null)
+        {
+            MessageBox.Show("Media file record not found in library.", "Playback Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var drive = await _repository.GetDriveByIdAsync(file.DriveId);
+        if (drive == null)
+        {
+            MessageBox.Show("Drive record not found.", "Playback Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+            return;
+        }
+
+        var resolvedPath = _driveService.ResolveFullPath(drive, file.RelativePath);
+        if (string.IsNullOrEmpty(resolvedPath) || !System.IO.File.Exists(resolvedPath))
+        {
+            MessageBox.Show(
+                $"Please connect drive '{drive.Label}' ({drive.LastKnownLetter}) to play this title.\n\nRelative path: {file.RelativePath}",
+                "Drive Not Connected",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return;
+        }
+
+        var playerWin = new PlayerWindow(_repository, file, resolvedPath, title.Name)
+        {
+            Owner = this
+        };
+        playerWin.ShowDialog();
     }
 
-    private void OnPlayEpisode(Episode episode)
+    private async void OnPlayEpisode(Episode episode)
     {
-        // Handled in M4 (Playback)
+        if (!episode.MediaFileId.HasValue)
+        {
+            MessageBox.Show("No media file linked to this episode.", "Playback Error", MessageBoxButton.OK, MessageBoxImage.Information);
+            return;
+        }
+
+        var file = await _repository.GetMediaFileByIdAsync(episode.MediaFileId.Value);
+        if (file == null) return;
+
+        var drive = await _repository.GetDriveByIdAsync(file.DriveId);
+        if (drive == null) return;
+
+        var resolvedPath = _driveService.ResolveFullPath(drive, file.RelativePath);
+        if (string.IsNullOrEmpty(resolvedPath) || !System.IO.File.Exists(resolvedPath))
+        {
+            MessageBox.Show(
+                $"Please connect drive '{drive.Label}' ({drive.LastKnownLetter}) to play this episode.",
+                "Drive Not Connected",
+                MessageBoxButton.OK,
+                MessageBoxImage.Warning);
+            return;
+        }
+
+        var epTitle = string.IsNullOrEmpty(episode.Name) ? $"Episode {episode.EpisodeNumber}" : episode.Name;
+        var playerWin = new PlayerWindow(_repository, file, resolvedPath, epTitle)
+        {
+            Owner = this
+        };
+        playerWin.ShowDialog();
     }
 
     private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e)

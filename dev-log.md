@@ -65,5 +65,20 @@
   - UI builds with 0 errors and 0 warnings.
 - **Status**: Completed.
 
+## [2026-10-14 15:03:00 +06:00] - Milestone 4: Playback Completed
+- **Task**: Implement native media player using LibVLCSharp, subtitle and audio track selection, delay adjustment, resume prompts, and auto-play next episode.
+- **Actions**:
+  - Implemented `LibVlcPlayerService` with hardware decoding flags, position/duration events, audio/subtitle track enumeration and switching, subtitle delay control, and external subtitle auto-attachment (.srt, .ass, .vtt).
+  - Implemented `PlayerWindow` with auto-hiding cinematic HUD, seek scrubber, volume control, track selection, speed controller (0.5x to 2.0x), and fullscreen mode.
+  - Implemented periodic watch position persistence (every 5 seconds) and automatic 90% watched threshold marking in SQLite.
+  - Added resume prompt modal and next episode countdown prompt (10-second countdown before playing next episode).
+  - Added full keyboard shortcuts (Space, Left/Right, Up/Down, F/F11, M, Esc).
+  - Built `M4_PlaybackTests` verifying resume positions and watched state thresholds.
+- **Verification**:
+  - 59 tests passed (59/59 green).
+  - Clean build across all 8 projects.
+- **Status**: Completed.
+
+
 
 
