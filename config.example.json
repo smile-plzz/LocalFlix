@@ -1,0 +1,21 @@
+{
+  "LocalFlix": {
+    "Metadata": {
+      "TmdbApiKey": "YOUR_TMDB_API_KEY_HERE",
+      "OmdbApiKey": "YOUR_OMDB_API_KEY_HERE",
+      "LanguagePreference": "en-US",
+      "AutoAcceptConfidenceThreshold": 0.85
+    },
+    "Scanner": {
+      "MinFileSizeMB": 35,
+      "ExcludePersonalVideos": true,
+      "SmartScanEnabled": true
+    },
+    "Playback": {
+      "HardwareAcceleration": true,
+      "AutoResume": true,
+      "AutoPlayNextEpisode": true,
+      "PreferredSubtitleLanguage": "en"
+    }
+  }
+}

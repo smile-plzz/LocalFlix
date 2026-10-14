@@ -36,3 +36,17 @@
   - Incremental scanning and personal video review queue verified.
 - **Status**: Completed.
 
+## [2026-10-14 14:55:00 +06:00] - Milestone 2: Metadata Completed
+- **Task**: Implement metadata providers (TMDB, OMDb, Fake), fuzzy title matcher, NFO hint reader, offline artwork caching, and Needs Review queue orchestration.
+- **Actions**:
+  - Created `FuzzyMatcher` using Dice coefficient bigram scoring and year penalties.
+  - Implemented `NfoMetadataReader` to detect local XML/text metadata and extract IMDb/TMDb IDs.
+  - Implemented `TmdbMetadataProvider` and `OmdbMetadataProvider` with strict query filtering (only clean title and year sent).
+  - Implemented `MetadataOrchestrator` to handle auto-acceptance (> 0.85 confidence), Needs Review routing, and manual re-matching with overrides remembered.
+  - Added `config.example.json` for API keys and user preferences.
+  - Built `M2_MetadataTests` verifying auto-matching, review routing, and manual corrections.
+- **Verification**:
+  - 48 tests passed (48/48 green).
+- **Status**: Completed.
+
+

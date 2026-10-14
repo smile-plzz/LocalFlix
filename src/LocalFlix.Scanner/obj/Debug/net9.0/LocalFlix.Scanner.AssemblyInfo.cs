@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("LocalFlix.Scanner")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d9dadc0c0f0b22d666b9ca481686b05f47cf16d1")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+436875e1cbc546267e6e3d884c52a9cd23d24108")]
 [assembly: System.Reflection.AssemblyProductAttribute("LocalFlix.Scanner")]
 [assembly: System.Reflection.AssemblyTitleAttribute("LocalFlix.Scanner")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
