@@ -23,3 +23,16 @@
   - Solution build succeeded: 0 warnings, 0 errors.
   - `M0_DatabaseTests` passed (3/3 tests green).
 - **Status**: Completed.
+
+## [2026-10-14 14:50:00 +06:00] - Milestone 1: Scanner and Parser Completed
+- **Task**: Implement file discovery, filename parsing, media classification, personal video exclusion, and test fixtures corpus.
+- **Actions**:
+  - Implemented `FilenameParser` with support for movies, TV series (SxxExx and 1x01), multi-episode files, anime numbering, release tags, and directory context fallback.
+  - Implemented `MediaClassifier` with heuristics for camera prefixes, DCIM/camera folders, sample/trailer noise filtering, and reason generation.
+  - Implemented `FileScanner` with throttled sequential I/O, incremental rescanning (skipping unchanged files), and smart scan candidate folder discovery.
+  - Added comprehensive test suite `M1_ScannerAndParserTests` covering real-world release naming, foreign films, anime, personal video filtering, and directory scans.
+- **Verification**:
+  - 40 tests passed across all test suites (40/40 green in 170 ms).
+  - Incremental scanning and personal video review queue verified.
+- **Status**: Completed.
+

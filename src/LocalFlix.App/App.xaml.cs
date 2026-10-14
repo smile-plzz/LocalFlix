@@ -36,6 +36,11 @@ public partial class App : Application
         services.AddSingleton<IImageCacheService, ImageCacheService>();
         services.AddSingleton<IMetadataProvider, FakeMetadataProvider>();
 
+        // Scanner & Parser
+        services.AddSingleton<IFilenameParser, LocalFlix.Scanner.FilenameParser>();
+        services.AddSingleton<IMediaClassifier, LocalFlix.Scanner.MediaClassifier>();
+        services.AddSingleton<IFileScanner, LocalFlix.Scanner.FileScanner>();
+
         services.AddSingleton<MainWindow>();
     }
 }
