@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - Offline stabilization
+
+- Replace fake production metadata and repair scanning, path resolution, review, watchlist, TV grouping and playback integration.
+- Add disk response caching, safer image writes, saved playback preferences, bounded browse pages and Windows build/package automation.
+- Add regression tests and explicitly track unimplemented README requirements and unverified release gates in `docs/RELEASE-READINESS.md`.
+
 ## [1.0.0] - 2026-10-14 - Offline Release (Milestones M0 to M6 Complete)
 
 ### Added

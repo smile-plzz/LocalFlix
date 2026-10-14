@@ -38,6 +38,7 @@ public class MediaClassifier : IMediaClassifier
 
     public bool IsNoise(string fullPath, long fileSizeBytes)
     {
+        fullPath = fullPath.Replace('\\', Path.DirectorySeparatorChar);
         var filename = Path.GetFileNameWithoutExtension(fullPath).ToLowerInvariant();
         var rawFilename = Path.GetFileName(fullPath);
         var dir = Path.GetDirectoryName(fullPath)?.ToLowerInvariant() ?? string.Empty;
@@ -49,7 +50,7 @@ public class MediaClassifier : IMediaClassifier
         }
         foreach (var pFolder in PersonalFolders)
         {
-            if (dir.Contains(pFolder))
+            if (dir.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, '\\').Contains(pFolder))
             {
                 return false;
             }
@@ -89,13 +90,14 @@ public class MediaClassifier : IMediaClassifier
         ParsedMediaInfo parsedInfo,
         out string reason)
     {
+        fullPath = fullPath.Replace('\\', Path.DirectorySeparatorChar);
         var filename = Path.GetFileName(fullPath);
         var dir = Path.GetDirectoryName(fullPath)?.ToLowerInvariant() ?? string.Empty;
 
         // Signal 1: Camera folder check
         foreach (var pFolder in PersonalFolders)
         {
-            if (dir.Contains(pFolder))
+            if (dir.Split(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar, '\\').Contains(pFolder))
             {
                 reason = $"Located in personal/camera folder: '{pFolder}'";
                 return true;

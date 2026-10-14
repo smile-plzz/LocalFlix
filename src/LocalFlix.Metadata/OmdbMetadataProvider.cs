@@ -8,14 +8,15 @@ namespace LocalFlix.Metadata;
 public class OmdbMetadataProvider : IMetadataProvider
 {
     private readonly HttpClient _httpClient;
-    private readonly string? _apiKey;
+    private readonly string? _configuredApiKey;
+    private string? _apiKey => _configuredApiKey ?? Environment.GetEnvironmentVariable("OMDB_API_KEY", EnvironmentVariableTarget.User) ?? Environment.GetEnvironmentVariable("OMDB_API_KEY");
 
     public string ProviderName => "OpenMovieDatabase";
 
     public OmdbMetadataProvider(HttpClient? httpClient = null, string? apiKey = null)
     {
         _httpClient = httpClient ?? new HttpClient { Timeout = TimeSpan.FromSeconds(10) };
-        _apiKey = apiKey ?? Environment.GetEnvironmentVariable("OMDB_API_KEY");
+        _configuredApiKey = apiKey;
     }
 
     public async Task<IReadOnlyList<MetadataSearchResult>> SearchAsync(
@@ -77,6 +78,7 @@ public class OmdbMetadataProvider : IMetadataProvider
 
             return list.OrderByDescending(r => r.ConfidenceScore).ToList();
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch
         {
             return Array.Empty<MetadataSearchResult>();
@@ -143,6 +145,7 @@ public class OmdbMetadataProvider : IMetadataProvider
                 Type = root.TryGetProperty("Type", out var ty) && ty.GetString() == "series" ? MediaType.TvShow : MediaType.Movie
             };
         }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { throw; }
         catch
         {
             return null;

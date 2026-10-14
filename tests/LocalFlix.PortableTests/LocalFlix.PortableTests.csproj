@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+<PropertyGroup><TargetFramework>net10.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable><IsPackable>false</IsPackable></PropertyGroup>
+<ItemGroup>
+<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+<PackageReference Include="xunit" Version="2.9.2" />
+<PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" />
+<Using Include="Xunit" />
+</ItemGroup>
+<ItemGroup>
+<Compile Include="../LocalFlix.Tests/M0_DatabaseTests.cs" Link="M0_DatabaseTests.cs" />
+<Compile Include="../LocalFlix.Tests/M1_ScannerAndParserTests.cs" Link="M1_ScannerAndParserTests.cs" />
+<Compile Include="../LocalFlix.Tests/M2_MetadataTests.cs" Link="M2_MetadataTests.cs" />
+<Compile Include="../LocalFlix.Tests/M4_PlaybackTests.cs" Link="M4_PlaybackTests.cs" />
+<Compile Include="../LocalFlix.Tests/OfflineRegressionTests.cs" Link="OfflineRegressionTests.cs" />
+<ProjectReference Include="../../src/LocalFlix.Core/LocalFlix.Core.csproj" />
+<ProjectReference Include="../../src/LocalFlix.Data/LocalFlix.Data.csproj" />
+<ProjectReference Include="../../src/LocalFlix.Scanner/LocalFlix.Scanner.csproj" />
+<ProjectReference Include="../../src/LocalFlix.Metadata/LocalFlix.Metadata.csproj" />
+<Compile Include="../../src/LocalFlix.Drives/WindowsDriveService.cs" Link="WindowsDriveService.cs" />
+</ItemGroup>
+</Project>

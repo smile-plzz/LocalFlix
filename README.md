@@ -1,3 +1,5 @@
+> Implementation status (2026-10-14): offline stabilization in progress. See [release readiness](docs/RELEASE-READINESS.md) for fixes, verification steps and remaining requirements. Historical milestone claims below do not certify the real-drive or two-week acceptance gates.
+
 
 
 # LocalFlix (working title): Project Plan
@@ -423,7 +425,7 @@ A native Windows desktop application that turns external hard drives full of mov
 
 ## Architecture & Tech Stack
 - Platform: Windows 10 (1809+) and Windows 11 (x64)
-- Framework: WPF on .NET 9.0 LTS with modern dark theme
+- Framework: WPF on .NET 9.0 with modern dark theme
 - Media Engine: LibVLCSharp (LibVLC) with hardware acceleration and extensive audio/subtitle codec support
 - Database: Embedded SQLite with versioned migrations
 - Metadata: TMDB API (primary details and artwork) + OMDb API (IMDb scores) with full offline disk caching

@@ -24,6 +24,10 @@ public partial class PlayerWindow : Window
     private bool _isUserDraggingSlider = false;
     private bool _isNextEpisodeCountdownRunning = false;
     private PlaybackState? _initialState;
+    private bool _closing;
+    private bool _ended;
+    private bool _closeReady;
+    public bool PlayNextRequested { get; private set; }
 
     public PlayerWindow(
         ILibraryRepository repository,
@@ -37,9 +41,10 @@ public partial class PlayerWindow : Window
         _mediaFile = mediaFile;
         _fullPath = fullPath;
         _title = title;
-        _nextEpisode = nextEpisode;
+        var preferences = LocalFlix.Data.PlaybackPreferences.Load();
+        _nextEpisode = preferences.AutoPlayNext ? nextEpisode : null;
 
-        _playerService = new LibVlcPlayerService(enableHardwareAcceleration: true);
+        _playerService = new LibVlcPlayerService(preferences.HardwareAcceleration, preferences.SubtitleLanguage);
         if (_playerService.MediaPlayer != null)
         {
             VideoViewControl.MediaPlayer = _playerService.MediaPlayer;
@@ -92,9 +97,11 @@ public partial class PlayerWindow : Window
 
     private void HookPlayerEvents()
     {
+        _playerService.ErrorOccurred += (s, message) => Dispatcher.InvokeAsync(() =>
+            MessageBox.Show(this, message + " Check that the media drive is connected.", "Playback error", MessageBoxButton.OK, MessageBoxImage.Warning));
         _playerService.PositionChanged += (s, pos) =>
         {
-            Dispatcher.Invoke(() =>
+            Dispatcher.InvokeAsync(() =>
             {
                 if (!_isUserDraggingSlider)
                 {
@@ -104,7 +111,7 @@ public partial class PlayerWindow : Window
 
                 // Check for end of episode to trigger next episode countdown
                 var dur = _playerService.DurationSeconds;
-                if (dur > 60 && pos >= (dur - 90) && _nextEpisode != null && !_isNextEpisodeCountdownRunning)
+                if (dur > 60 && pos >= Math.Max(dur * 0.90, dur - 90) && _nextEpisode != null && !_isNextEpisodeCountdownRunning)
                 {
                     ShowNextEpisodePrompt();
                 }
@@ -113,7 +120,7 @@ public partial class PlayerWindow : Window
 
         _playerService.DurationChanged += (s, dur) =>
         {
-            Dispatcher.Invoke(() =>
+            Dispatcher.InvokeAsync(() =>
             {
                 SeekSlider.Maximum = dur;
                 TotalTimeText.Text = FormatTime(dur);
@@ -123,8 +130,9 @@ public partial class PlayerWindow : Window
 
         _playerService.EndReached += (s, e) =>
         {
-            Dispatcher.Invoke(async () =>
+            Dispatcher.InvokeAsync(async () =>
             {
+                _ended = true;
                 await MarkAsWatchedAsync();
                 if (_nextEpisode != null && !_isNextEpisodeCountdownRunning)
                 {
@@ -187,7 +195,7 @@ public partial class PlayerWindow : Window
 
     private void PlayNextEpisode()
     {
-        // Play next episode transition
+        PlayNextRequested = true;
         Close();
     }
 
@@ -197,7 +205,8 @@ public partial class PlayerWindow : Window
 
         var pos = _playerService.CurrentPositionSeconds;
         var dur = _playerService.DurationSeconds;
-        bool isWatched = pos >= (dur * 0.90) || (dur - pos) < 180;
+        if (_ended) pos = dur;
+        bool isWatched = _ended || pos >= (dur * 0.90);
 
         await _repository.UpsertPlaybackStateAsync(new PlaybackState
         {
@@ -223,12 +232,23 @@ public partial class PlayerWindow : Window
 
     private async void PlayerWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
     {
+        if (_closeReady) return;
+        e.Cancel = true;
+        if (_closing) return;
+        _closing = true;
         _hudTimer.Stop();
         _saveProgressTimer.Stop();
         _nextEpisodeTimer.Stop();
-        await SavePlaybackProgressAsync();
-        _playerService.Dispose();
-        Mouse.OverrideCursor = null;
+        try { await SavePlaybackProgressAsync(); }
+        catch (Exception ex) { MessageBox.Show("Could not save playback position: " + ex.Message); }
+        finally
+        {
+            VideoViewControl.MediaPlayer = null;
+            await Task.Run(() => _playerService.Dispose());
+            Mouse.OverrideCursor = null;
+            _closeReady = true;
+            Close();
+        }
     }
 
     private void Window_MouseMove(object sender, MouseEventArgs e)
@@ -312,7 +332,7 @@ public partial class PlayerWindow : Window
 
     private void VolumeSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
-        _playerService.Volume = (int)e.NewValue;
+        if (_playerService != null) _playerService.Volume = (int)e.NewValue;
     }
 
     private void SeekSlider_PreviewMouseDown(object sender, MouseButtonEventArgs e) => _isUserDraggingSlider = true;
@@ -354,6 +374,10 @@ public partial class PlayerWindow : Window
             }
         }
     }
+
+    private long _subtitleDelay;
+    private void SubtitleEarlier_Click(object sender, RoutedEventArgs e) { _subtitleDelay -= 100; _playerService.SetSubtitleDelay(_subtitleDelay); }
+    private void SubtitleLater_Click(object sender, RoutedEventArgs e) { _subtitleDelay += 100; _playerService.SetSubtitleDelay(_subtitleDelay); }
 
     private void SpeedButton_Click(object sender, RoutedEventArgs e)
     {

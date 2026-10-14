@@ -32,3 +32,5 @@ cache/
 *.avi
 *.mov
 *.webm
+
+*_wpftmp.csproj

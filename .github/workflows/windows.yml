@@ -1,0 +1,39 @@
+name: Windows build and offline tests
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: |
+            9.0.x
+            10.0.x
+      - name: Test Windows solution
+        run: dotnet test tests/LocalFlix.Tests/LocalFlix.Tests.csproj -c Release --logger "trx;LogFileName=windows.trx"
+      - name: Publish self-contained Windows x64 app
+        run: ./scripts/package.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: LocalFlix-windows-x64
+          path: dist/LocalFlix-windows-x64.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: tests/**/TestResults/*.trx
+  portable:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+      - run: dotnet test tests/LocalFlix.PortableTests/LocalFlix.PortableTests.csproj -c Release

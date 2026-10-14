@@ -34,7 +34,8 @@ public partial class App : Application
         services.AddSingleton(new DatabaseMigrator(dbPath));
         services.AddSingleton<ILibraryRepository>(_ => new SqliteLibraryRepository(dbPath));
         services.AddSingleton<IImageCacheService, ImageCacheService>();
-        services.AddSingleton<IMetadataProvider, FakeMetadataProvider>();
+        services.AddSingleton<IMetadataProvider>(_ => new CachedMetadataProvider(new TmdbMetadataProvider(), Path.Combine(Path.GetDirectoryName(dbPath)!, "metadata")));
+        services.AddSingleton<OmdbMetadataProvider>();
 
         // Scanner & Parser
         services.AddSingleton<IFilenameParser, LocalFlix.Scanner.FilenameParser>();
@@ -42,7 +43,9 @@ public partial class App : Application
         services.AddSingleton<IFileScanner, LocalFlix.Scanner.FileScanner>();
 
         // Metadata Orchestrator & Drive Service
-        services.AddSingleton<MetadataOrchestrator>();
+        services.AddSingleton(sp => new MetadataOrchestrator(
+            sp.GetRequiredService<ILibraryRepository>(), sp.GetRequiredService<IImageCacheService>(),
+            sp.GetRequiredService<IMetadataProvider>(), new CachedMetadataProvider(sp.GetRequiredService<OmdbMetadataProvider>(), Path.Combine(Path.GetDirectoryName(dbPath)!, "metadata"))));
         services.AddSingleton<IDriveService, LocalFlix.Drives.WindowsDriveService>();
 
         services.AddSingleton<MainWindow>();

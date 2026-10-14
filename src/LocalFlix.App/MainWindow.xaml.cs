@@ -57,6 +57,7 @@ public partial class MainWindow : Window
                 {
                     await Dispatcher.InvokeAsync(async () =>
                     {
+                        await Task.Run(() => winDrives.SynchronizeDrivesAsync(_repository));
                         DriveStatusText.Text = args.IsArrival
                             ? $"Drive Connected ({args.Drive.LastKnownLetter})"
                             : "Drive Disconnected";
@@ -140,7 +141,7 @@ public partial class MainWindow : Window
                 break;
 
             case "Watchlist":
-                var watchlistView = new SearchView(_repository);
+                var watchlistView = new SearchView(_repository, watchlistOnly: true);
                 watchlistView.TitleSelected += (s, title) => ShowTitleDetails(title);
                 MainContentHost.Content = watchlistView;
                 break;
@@ -152,6 +153,10 @@ public partial class MainWindow : Window
                     if (_homeView != null) await _homeView.LoadDataAsync();
                 };
                 MainContentHost.Content = _needsReviewView;
+                break;
+
+            case "Drives":
+                ShowDrivesAsync();
                 break;
 
             case "Settings":
@@ -185,14 +190,32 @@ public partial class MainWindow : Window
         }
     }
 
+    private async void ShowDrivesAsync()
+    {
+        var panel = new StackPanel { Margin = new Thickness(32) };
+        panel.Children.Add(new TextBlock { Text = "Your media drives", FontSize = 24, Foreground = (System.Windows.Media.Brush)FindResource("TextPrimaryBrush") });
+        var drives = await _repository.GetAllDrivesAsync();
+        foreach (var drive in drives)
+            panel.Children.Add(new TextBlock
+            {
+                Text = $"{drive.Label}  |  {(drive.IsConnected ? "Connected" : "Drive not connected")}  |  {drive.LastKnownLetter}\n{drive.VolumeGuid}",
+                Margin = new Thickness(0, 20, 0, 0), TextWrapping = TextWrapping.Wrap,
+                Foreground = (System.Windows.Media.Brush)FindResource("TextSecondaryBrush")
+            });
+        if (drives.Count == 0) panel.Children.Add(new TextBlock { Text = "Add a media folder to register your first drive.", Foreground = (System.Windows.Media.Brush)FindResource("TextSecondaryBrush"), Margin = new Thickness(0, 20, 0, 0) });
+        MainContentHost.Content = new ScrollViewer { Content = panel };
+    }
+
     private void ShowTitleDetails(TitleItem title)
     {
         var detailView = new DetailView(_repository, title);
         detailView.BackRequested += (s, e) => NavigateTo("Home");
         detailView.PlayRequested += (s, t) => OnPlayTitle(t);
         detailView.EpisodePlayRequested += (s, ep) => OnPlayEpisode(ep);
-        detailView.FixMatchRequested += (s, t) =>
+        detailView.FixMatchRequested += async (s, t) =>
         {
+            if (t.MediaFileId.HasValue)
+                await _repository.UpsertReviewItemAsync(new ReviewItem { MediaFileId = t.MediaFileId.Value, Reason = "Manual correction requested" });
             NavigateTo("NeedsReview");
         };
         MainContentHost.Content = detailView;
@@ -200,6 +223,18 @@ public partial class MainWindow : Window
 
     private async void OnPlayTitle(TitleItem title)
     {
+        if (title.Type == MediaType.TvShow)
+        {
+            var series = await _repository.GetSeriesByTitleIdAsync(title.Id);
+            if (series != null)
+                foreach (var season in await _repository.GetSeasonsBySeriesIdAsync(series.Id))
+                    foreach (var episode in await _repository.GetEpisodesBySeasonIdAsync(season.Id))
+                    {
+                        if (!episode.MediaFileId.HasValue) continue;
+                        var state = await _repository.GetPlaybackStateAsync(episode.MediaFileId.Value);
+                        if (state?.IsWatched != true) { OnPlayEpisode(episode); return; }
+                    }
+        }
         if (!title.MediaFileId.HasValue)
         {
             MessageBox.Show("No media file linked to this title.", "Playback Error", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -264,11 +299,28 @@ public partial class MainWindow : Window
         }
 
         var epTitle = string.IsNullOrEmpty(episode.Name) ? $"Episode {episode.EpisodeNumber}" : episode.Name;
-        var playerWin = new PlayerWindow(_repository, file, resolvedPath, epTitle)
+        Episode? nextEpisode = null;
+        var currentSeason = episode.SeasonId;
+        foreach (var title in await _repository.GetAllTitlesAsync(MediaType.TvShow))
+        {
+            var series = await _repository.GetSeriesByTitleIdAsync(title.Id);
+            if (series == null) continue;
+            var seasons = await _repository.GetSeasonsBySeriesIdAsync(series.Id);
+            if (!seasons.Any(s => s.Id == currentSeason)) continue;
+            var episodes = new List<Episode>();
+            foreach (var season in seasons.OrderBy(s => s.SeasonNumber))
+                episodes.AddRange(await _repository.GetEpisodesBySeasonIdAsync(season.Id));
+            nextEpisode = episodes.SkipWhile(ep => ep.Id != episode.Id).Skip(1)
+                .FirstOrDefault(ep => ep.MediaFileId.HasValue && ep.MediaFileId != episode.MediaFileId);
+            break;
+        }
+        var playerWin = new PlayerWindow(_repository, file, resolvedPath, epTitle, nextEpisode)
         {
             Owner = this
         };
         playerWin.ShowDialog();
+        if (playerWin.PlayNextRequested && nextEpisode != null)
+            _ = Dispatcher.InvokeAsync(() => OnPlayEpisode(nextEpisode));
     }
 
     private async void SearchBox_TextChanged(object sender, TextChangedEventArgs e)

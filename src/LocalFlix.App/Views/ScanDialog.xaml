@@ -51,6 +51,7 @@
         <!-- Bottom Actions -->
         <Grid Grid.Row="3">
             <Button x:Name="CancelButton" Content="Close" Style="{StaticResource CinematicButton}" HorizontalAlignment="Left" Padding="18,8" Click="CancelButton_Click" />
+            <Button x:Name="PauseButton" Content="Pause" IsEnabled="False" HorizontalAlignment="Center" Style="{StaticResource CinematicButton}" Click="PauseButton_Click" />
             <Button x:Name="StartScanButton" Content="Start Scan" Style="{StaticResource AccentButton}" HorizontalAlignment="Right" Padding="22,8" Click="StartScanButton_Click" />
         </Grid>
     </Grid>

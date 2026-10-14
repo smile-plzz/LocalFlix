@@ -113,3 +113,7 @@
 - **Verification**:
   - Remote accepted all commits cleanly with branch tracking `main -> main`.
 - **Status**: Completed.
+
+## 2026-10-14 - Offline integration audit and repair
+
+The prior completion claims were audited against the README and source. Production still used fake metadata, folder scans used the wrong relative-path base, title upserts duplicated entries, and Watchlist/next-episode controls were not connected to their intended behavior. These and related drive, caching and player issues have been repaired. See `docs/RELEASE-READINESS.md` for remaining requirements and actual acceptance gates. Native playback and physical drive tests cannot be certified by a Linux cross-build.

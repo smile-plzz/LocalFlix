@@ -31,6 +31,13 @@ public partial class ScanDialog : Window
         _orchestrator = orchestrator;
         _parser = parser;
         _driveService = driveService;
+        Closing += (_, e) =>
+        {
+            if (!_isScanning) return;
+            _cts?.Cancel();
+            e.Cancel = true;
+            StatusMessageText.Text = "Cancelling safely. Close once scanning stops.";
+        };
     }
 
     private void BrowseButton_Click(object sender, RoutedEventArgs e)
@@ -66,6 +73,26 @@ public partial class ScanDialog : Window
             return;
         }
 
+        var roots = new List<string> { path };
+        if (SmartScanCheckBox.IsChecked == true && _scanner is LocalFlix.Scanner.FileScanner smartScanner)
+        {
+            StartScanButton.IsEnabled = false;
+            _isScanning = true;
+            _cts = new CancellationTokenSource();
+            try
+            {
+                var candidates = await Task.Run(() => smartScanner.DiscoverCandidateFoldersAsync(path, _cts.Token));
+                roots.Clear();
+                foreach (var candidate in candidates)
+                    if (MessageBox.Show(this, $"Add this folder?\n{candidate.Path}\n{candidate.VideoFileCount} videos", "Confirm discovered folder", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                        roots.Add(candidate.Path);
+                if (roots.Count == 0) return;
+            }
+            catch (OperationCanceledException) { StatusMessageText.Text = "Discovery cancelled."; return; }
+            catch (Exception ex) { StatusMessageText.Text = "Discovery failed: " + ex.Message; return; }
+            finally { _isScanning = false; _cts?.Dispose(); _cts = null; StartScanButton.IsEnabled = true; }
+        }
+        PauseButton.IsEnabled = true;
         _isScanning = true;
         _cts = new CancellationTokenSource();
         StartScanButton.Content = "Stop Scan";
@@ -92,24 +119,29 @@ public partial class ScanDialog : Window
 
             var progress = new Progress<ScanProgress>(p =>
             {
-                CountsText.Text = $"Discovered: {p.FilesDiscovered} | Processed: {p.FilesProcessed} | Matched: {p.FilesMatched} | Review: {p.FilesNeedingReview}";
+                CountsText.Text = $"Discovered: {p.FilesDiscovered} | Processed: {p.FilesProcessed} | Indexed: {p.FilesMatched} | Review: {p.FilesNeedingReview}";
                 CurrentFileText.Text = Path.GetFileName(p.CurrentPath);
                 StatusMessageText.Text = $"Processing: {Path.GetFileName(p.CurrentPath)}";
             });
 
-            await _scanner.ScanDirectoryAsync(path, driveId, progress, _cts.Token);
+            foreach (var root in roots)
+                await Task.Run(() => _scanner.ScanDirectoryAsync(root, driveId, progress, _cts.Token));
 
             // Run metadata enrichment for newly added active files
+            PauseButton.IsEnabled = false;
             StatusMessageText.Text = "Enriching metadata and posters...";
             var files = await _repository.GetFilesByDriveIdAsync(driveId);
             int enriched = 0;
 
-            foreach (var f in files.Where(x => x.Status == FileStatus.Active))
+            var titles = await _repository.GetAllTitlesAsync();
+            var matchedIds = titles.Where(t => t.MediaFileId.HasValue).Select(t => t.MediaFileId!.Value).ToHashSet();
+            foreach (var f in files.Where(x => x.Status == FileStatus.Active && !matchedIds.Contains(x.Id)))
             {
-                if (_cts.IsCancellationRequested) break;
+                _cts.Token.ThrowIfCancellationRequested();
 
-                var fullPath = Path.Combine(path, f.RelativePath);
-                var parsed = _parser.Parse(Path.GetFileName(f.RelativePath));
+                var fullPath = Path.Combine(drive.LastKnownLetter, f.RelativePath);
+                if (!roots.Any(root => fullPath.StartsWith(Path.TrimEndingDirectorySeparator(root) + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase))) continue;
+                var parsed = _parser.Parse(Path.GetFileName(f.RelativePath), Path.GetFileName(Path.GetDirectoryName(f.RelativePath)));
                 await _orchestrator.MatchMediaFileAsync(f, parsed, fullPath, _cts.Token);
                 enriched++;
                 CountsText.Text = $"Enriched metadata: {enriched}/{files.Count}";
@@ -130,11 +162,26 @@ public partial class ScanDialog : Window
         }
         finally
         {
+            PauseButton.IsEnabled = false;
+            PauseButton.Content = "Pause";
+            if (_scanner is LocalFlix.Scanner.FileScanner fs) fs.IsPaused = false;
+            _cts?.Dispose();
+            _cts = null;
             _isScanning = false;
             StartScanButton.Content = "Start Scan";
             StartScanButton.IsEnabled = true;
             CancelButton.IsEnabled = true;
             ScanProgressBar.IsIndeterminate = false;
+        }
+    }
+
+    private void PauseButton_Click(object sender, RoutedEventArgs e)
+    {
+        if (_scanner is LocalFlix.Scanner.FileScanner scanner)
+        {
+            scanner.IsPaused = !scanner.IsPaused;
+            PauseButton.Content = scanner.IsPaused ? "Resume" : "Pause";
+            StatusMessageText.Text = scanner.IsPaused ? "Paused. Your progress is saved." : "Scanning...";
         }
     }
 

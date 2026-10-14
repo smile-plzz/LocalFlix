@@ -48,7 +48,7 @@ public class LibVlcPlayerService : IPlayerService
 
     public MediaPlayer? MediaPlayer => _mediaPlayer;
 
-    public LibVlcPlayerService(bool enableHardwareAcceleration = true)
+    public LibVlcPlayerService(bool enableHardwareAcceleration = true, string subtitleLanguage = "English")
     {
         EnsureInitialized();
 
@@ -58,6 +58,13 @@ public class LibVlcPlayerService : IPlayerService
             "--mouse-hide-timeout=2000"
         };
 
+        var language = subtitleLanguage switch
+        {
+            "Bengali" => "ben", "Spanish" => "spa", "French" => "fra", "German" => "deu",
+            "Hindi" => "hin", "Japanese" => "jpn", _ => "eng"
+        };
+        options.Add("--sub-language=" + language);
+        if (!enableHardwareAcceleration) options.Add("--avcodec-hw=none");
         if (enableHardwareAcceleration)
         {
             options.Add("--avcodec-hw=any");
@@ -129,29 +136,20 @@ public class LibVlcPlayerService : IPlayerService
 
         if (_libVLC == null || _mediaPlayer == null)
         {
+            ErrorOccurred?.Invoke(this, "The native player could not load. Reinstall the complete LocalFlix package.");
             return Task.CompletedTask;
         }
 
         try
         {
             using var media = new Media(_libVLC, mediaPath, FromType.FromPath);
+            if (startPositionSeconds > 0) media.AddOption($":start-time={startPositionSeconds.ToString(System.Globalization.CultureInfo.InvariantCulture)}");
             _mediaPlayer.Play(media);
 
             // Auto-detect beside external subtitles (.srt, .ass, .vtt)
             AttachExternalSubtitles(mediaPath);
 
-            if (startPositionSeconds > 5)
-            {
-                Task.Run(async () =>
-                {
-                    // Allow LibVLC to parse container before setting seek time
-                    await Task.Delay(400);
-                    if (_mediaPlayer != null)
-                    {
-                        _mediaPlayer.Time = (long)(startPositionSeconds * 1000);
-                    }
-                });
-            }
+
         }
         catch (Exception ex)
         {

@@ -30,8 +30,18 @@ public partial class TitleCardControl : UserControl
     {
         if (d is TitleCardControl control && e.NewValue is TitleCardViewModel item)
         {
+            if (e.OldValue is TitleCardViewModel old) old.PropertyChanged -= control.Item_PropertyChanged;
+            item.PropertyChanged += control.Item_PropertyChanged;
             control.UpdateVisuals(item);
         }
+    }
+
+    private void Item_PropertyChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (Item == null) return;
+        MissingDriveOverlay.Visibility = Item.IsDriveConnected ? Visibility.Collapsed : Visibility.Visible;
+        WatchProgressBar.Visibility = Item.ProgressPercentage > 0 ? Visibility.Visible : Visibility.Collapsed;
+        WatchProgressBar.Value = Item.ProgressPercentage;
     }
 
     private void UpdateVisuals(TitleCardViewModel item)
@@ -71,6 +81,7 @@ public partial class TitleCardControl : UserControl
                 var bmp = new BitmapImage();
                 bmp.BeginInit();
                 bmp.UriSource = uri;
+                bmp.DecodePixelWidth = 340;
                 bmp.CacheOption = BitmapCacheOption.OnLoad;
                 bmp.EndInit();
                 PosterImage.Source = bmp;
@@ -83,6 +94,15 @@ public partial class TitleCardControl : UserControl
         else
         {
             PosterImage.Source = null;
+        }
+    }
+
+    private void OnCardKeyDown(object sender, KeyEventArgs e)
+    {
+        if ((e.Key == Key.Enter || e.Key == Key.Space) && Item != null)
+        {
+            CardClicked?.Invoke(this, Item);
+            e.Handled = true;
         }
     }
 

@@ -12,7 +12,7 @@
         MouseMove="Window_MouseMove">
     <Grid Background="#000000">
         <!-- Video View -->
-        <vlc:VideoView x:Name="VideoViewControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" />
+        <vlc:VideoView x:Name="VideoViewControl" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
 
         <!-- Auto-hiding HUD Overlay -->
         <Grid x:Name="HudOverlay">
@@ -95,6 +95,8 @@
                             <!-- Subtitle Track Selector -->
                             <ComboBox x:Name="SubtitlesCombo" Width="120" Background="{StaticResource SurfaceDarkBrush}" Foreground="#FFFFFF" Margin="0,0,8,0" SelectionChanged="SubtitlesCombo_SelectionChanged" ToolTip="Subtitles" />
 
+                            <Button Content="Sub -" ToolTip="Subtitles 100 milliseconds earlier" Click="SubtitleEarlier_Click" Style="{StaticResource CinematicButton}" Padding="6" />
+                            <Button Content="Sub +" ToolTip="Subtitles 100 milliseconds later" Click="SubtitleLater_Click" Style="{StaticResource CinematicButton}" Padding="6" />
                             <!-- Playback Speed -->
                             <Button x:Name="SpeedButton" Content="1.0x" Style="{StaticResource CinematicButton}" Padding="10,6" FontSize="12" Margin="0,0,8,0" Click="SpeedButton_Click" ToolTip="Playback Speed" />
 
@@ -105,5 +107,6 @@
                 </StackPanel>
             </Border>
         </Grid>
+        </vlc:VideoView>
     </Grid>
 </Window>

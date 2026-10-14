@@ -29,6 +29,10 @@ public class MetadataOrchestrator
         string fullDiskPath,
         CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
+        var existingTitle = await _repository.GetTitleByMediaFileIdAsync(file.Id);
+        if (existingTitle?.MatchedBy == MatchMethod.Manual) return existingTitle;
+        if (file.Status == FileStatus.Excluded) return null;
         // Check for .nfo hints first
         var nfoHints = NfoMetadataReader.TryReadHints(fullDiskPath);
         string? targetProviderId = nfoHints?.TmdbId ?? nfoHints?.ImdbId;
@@ -68,16 +72,14 @@ public class MetadataOrchestrator
                 return null;
             }
 
-            var topCandidate = candidates[0];
+            var topCandidate = candidates.OrderByDescending(c => c.ConfidenceScore).First();
             confidence = topCandidate.ConfidenceScore;
 
             if (confidence >= 0.85)
             {
                 // High confidence: Auto-accept
-                details = await _primaryProvider.GetDetailsAsync(topCandidate.Id, topCandidate.Type, cancellationToken)
-                    ?? (topCandidate.Provider == _secondaryProvider?.ProviderName
-                        ? await _secondaryProvider.GetDetailsAsync(topCandidate.Id, topCandidate.Type, cancellationToken)
-                        : null);
+                var provider = topCandidate.Provider == _secondaryProvider?.ProviderName ? _secondaryProvider! : _primaryProvider;
+                details = await provider.GetDetailsAsync(topCandidate.Id, topCandidate.Type, cancellationToken);
             }
             else
             {
@@ -85,6 +87,7 @@ public class MetadataOrchestrator
                 var candidateSummaries = candidates.Take(5).Select(c => new
                 {
                     c.Id,
+                    c.Provider,
                     c.Title,
                     c.Year,
                     Type = c.Type.ToString(),
@@ -105,7 +108,7 @@ public class MetadataOrchestrator
         if (details == null) return null;
 
         // Fetch IMDb score from secondary provider if primary is TMDB and IMDb rating missing
-        if (!details.Rating.HasValue && !string.IsNullOrEmpty(details.ImdbId) && _secondaryProvider != null)
+        if (!string.IsNullOrEmpty(details.ImdbId) && _secondaryProvider != null)
         {
             var secondaryDetails = await _secondaryProvider.GetDetailsAsync(details.ImdbId, details.Type, cancellationToken);
             if (secondaryDetails?.Rating.HasValue == true)
@@ -129,7 +132,7 @@ public class MetadataOrchestrator
 
         var titleItem = new TitleItem
         {
-            Type = details.Type,
+            Type = details.Type == MediaType.Movie && details.Genres?.Contains("Documentary", StringComparison.OrdinalIgnoreCase) == true ? MediaType.Documentary : details.Type,
             TmdbId = details.TmdbId,
             ImdbId = details.ImdbId,
             Name = details.Title,
@@ -151,13 +154,22 @@ public class MetadataOrchestrator
         var titleId = await _repository.UpsertTitleAsync(titleItem);
         titleItem.Id = titleId;
 
-        if (details.Type == MediaType.TvShow || parsedInfo.SeasonNumber.HasValue)
+        await LinkEpisodesAsync(titleItem, file.Id, parsedInfo);
+
+        foreach (var review in (await _repository.GetPendingReviewItemsAsync()).Where(r => r.MediaFileId == file.Id))
+            await _repository.ResolveReviewItemAsync(review.Id);
+        return titleItem;
+    }
+
+    private async Task LinkEpisodesAsync(TitleItem titleItem, int fileId, ParsedMediaInfo parsedInfo)
+    {
+        if (titleItem.Type == MediaType.TvShow || parsedInfo.SeasonNumber.HasValue)
         {
             var series = new Series
             {
-                TitleItemId = titleId,
-                Name = details.Title,
-                Overview = details.Overview,
+                TitleItemId = titleItem.Id,
+                Name = titleItem.Name,
+                Overview = titleItem.Overview,
                 PosterPath = titleItem.PosterPath,
                 BackdropPath = titleItem.BackdropPath
             };
@@ -175,14 +187,16 @@ public class MetadataOrchestrator
             var episode = new Episode
             {
                 SeasonId = seasonId,
-                MediaFileId = file.Id,
+                MediaFileId = fileId,
                 EpisodeNumber = parsedInfo.EpisodeNumber ?? 1,
                 Name = $"Episode {parsedInfo.EpisodeNumber ?? 1}"
             };
             await _repository.UpsertEpisodeAsync(episode);
+            if (parsedInfo.SecondEpisodeNumber.HasValue && parsedInfo.SecondEpisodeNumber > episode.EpisodeNumber)
+                for (var number = episode.EpisodeNumber + 1; number <= Math.Min(parsedInfo.SecondEpisodeNumber.Value, episode.EpisodeNumber + 20); number++)
+                    await _repository.UpsertEpisodeAsync(new Episode { SeasonId = seasonId, MediaFileId = fileId, EpisodeNumber = number, Name = $"Episode {number}" });
         }
 
-        return titleItem;
     }
 
     public async Task<TitleItem> ApplyManualMatchAsync(
@@ -193,6 +207,8 @@ public class MetadataOrchestrator
         int? reviewItemId = null,
         CancellationToken cancellationToken = default)
     {
+        if (providerId.StartsWith("tt", StringComparison.OrdinalIgnoreCase) && _secondaryProvider != null)
+            provider = _secondaryProvider;
         var details = await provider.GetDetailsAsync(providerId, mediaType, cancellationToken)
             ?? throw new InvalidOperationException($"Could not find metadata for provider ID '{providerId}'");
 
@@ -210,7 +226,7 @@ public class MetadataOrchestrator
 
         var titleItem = new TitleItem
         {
-            Type = details.Type,
+            Type = details.Type == MediaType.Movie && details.Genres?.Contains("Documentary", StringComparison.OrdinalIgnoreCase) == true ? MediaType.Documentary : details.Type,
             TmdbId = details.TmdbId,
             ImdbId = details.ImdbId,
             Name = details.Title,
@@ -232,11 +248,25 @@ public class MetadataOrchestrator
         var titleId = await _repository.UpsertTitleAsync(titleItem);
         titleItem.Id = titleId;
 
+        var file = await _repository.GetMediaFileByIdAsync(mediaFileId);
+        if (file != null && titleItem.Type == MediaType.TvShow)
+        {
+            // Season and episode numbers are read from the existing local filename, never sent as paths.
+            var match = System.Text.RegularExpressions.Regex.Match(file.RelativePath, @"[Ss](\d+)[Ee](\d+)");
+            await LinkEpisodesAsync(titleItem, mediaFileId, new ParsedMediaInfo
+            {
+                SeasonNumber = match.Success ? int.Parse(match.Groups[1].Value) : 1,
+                EpisodeNumber = match.Success ? int.Parse(match.Groups[2].Value) : 1
+            });
+        }
+        await _repository.UpdateFileStatusAsync(mediaFileId, FileStatus.Active);
         if (reviewItemId.HasValue)
         {
             await _repository.ResolveReviewItemAsync(reviewItemId.Value);
         }
 
+        foreach (var review in (await _repository.GetPendingReviewItemsAsync()).Where(r => r.MediaFileId == titleItem.MediaFileId))
+            await _repository.ResolveReviewItemAsync(review.Id);
         return titleItem;
     }
 }

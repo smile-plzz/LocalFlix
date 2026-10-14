@@ -156,6 +156,13 @@ public class SqliteLibraryRepository : ILibraryRepository
             new { fileId, status });
     }
 
+    public async Task<TitleItem?> GetTitleByMediaFileIdAsync(int mediaFileId)
+    {
+        using var conn = CreateConnection();
+        return await conn.QueryFirstOrDefaultAsync<TitleItem>(
+            "SELECT t.* FROM Titles t WHERE t.MediaFileId = @mediaFileId OR t.Id IN (SELECT s.TitleItemId FROM Series s JOIN Seasons sn ON sn.SeriesId = s.Id JOIN Episodes e ON e.SeasonId = sn.Id WHERE e.MediaFileId = @mediaFileId) ORDER BY t.Id LIMIT 1", new { mediaFileId });
+    }
+
     // Titles
     public async Task<TitleItem?> GetTitleByIdAsync(int id)
     {
@@ -180,7 +187,7 @@ public class SqliteLibraryRepository : ILibraryRepository
         using var conn = CreateConnection();
         var sql = @"
             SELECT * FROM Titles
-            WHERE (Name LIKE @likeQuery OR CastMembers LIKE @likeQuery OR Director LIKE @likeQuery)
+            WHERE (Name LIKE @likeQuery OR CastMembers LIKE @likeQuery OR Director LIKE @likeQuery OR Genres LIKE @likeQuery)
               AND (@filterType IS NULL OR Type = @filterType)
               AND (@genre IS NULL OR Genres LIKE @likeGenre)
             ORDER BY Name";
@@ -209,10 +216,11 @@ public class SqliteLibraryRepository : ILibraryRepository
         using var conn = CreateConnection();
         var sql = @"
             SELECT t.* FROM Titles t
-            JOIN MediaFiles mf ON t.MediaFileId = mf.Id
-            JOIN PlaybackStates ps ON ps.MediaFileId = mf.Id
+            JOIN PlaybackStates ps ON ps.MediaFileId = t.MediaFileId
+                OR ps.MediaFileId IN (SELECT e.MediaFileId FROM Series s JOIN Seasons sn ON sn.SeriesId = s.Id JOIN Episodes e ON e.SeasonId = sn.Id WHERE s.TitleItemId = t.Id)
             WHERE ps.IsWatched = 0 AND ps.PositionSeconds > 30
-            ORDER BY ps.LastPlayedUtc DESC
+            GROUP BY t.Id
+            ORDER BY MAX(ps.LastPlayedUtc) DESC
             LIMIT @count";
         var result = await conn.QueryAsync<TitleItem>(sql, new { count });
         return result.ToList();
@@ -221,6 +229,24 @@ public class SqliteLibraryRepository : ILibraryRepository
     public async Task<int> UpsertTitleAsync(TitleItem title)
     {
         using var conn = CreateConnection();
+        if (title.Id == 0)
+        {
+            var existing = await conn.QueryFirstOrDefaultAsync<TitleItem>(@"
+                SELECT * FROM Titles WHERE
+                (@MediaFileId IS NOT NULL AND MediaFileId = @MediaFileId)
+                OR (@Type = 2 AND Type = 2 AND
+                    ((@TmdbId IS NOT NULL AND @TmdbId <> '' AND TmdbId = @TmdbId)
+                     OR (@ImdbId IS NOT NULL AND @ImdbId <> '' AND ImdbId = @ImdbId)))
+                ORDER BY Id LIMIT 1", title);
+            if (existing != null)
+            {
+                title.Id = existing.Id;
+                title.CreatedUtc = existing.CreatedUtc;
+                if (title.Type == MediaType.TvShow) title.MediaFileId = existing.MediaFileId;
+                if (existing.MatchedBy == MatchMethod.Manual && title.MatchedBy != MatchMethod.Manual)
+                    return existing.Id;
+            }
+        }
         if (title.Id == 0)
         {
             var id = await conn.ExecuteScalarAsync<int>(@"
@@ -275,7 +301,7 @@ public class SqliteLibraryRepository : ILibraryRepository
     {
         using var conn = CreateConnection();
         var result = await conn.QueryAsync<Season>(
-            "SELECT * FROM Seasons WHERE SeriesId = @seriesId ORDER BY SeasonNumber",
+            "SELECT s.Id, s.SeriesId, s.SeasonNumber, s.Name, s.PosterPath, (SELECT COUNT(*) FROM Episodes e WHERE e.SeasonId = s.Id) AS EpisodeCount FROM Seasons s WHERE SeriesId = @seriesId ORDER BY SeasonNumber",
             new { seriesId });
         return result.ToList();
     }
@@ -414,6 +440,14 @@ public class SqliteLibraryRepository : ILibraryRepository
     public async Task<int> UpsertReviewItemAsync(ReviewItem item)
     {
         using var conn = CreateConnection();
+        var existingId = await conn.QueryFirstOrDefaultAsync<int?>(
+            "SELECT Id FROM ReviewItems WHERE MediaFileId = @MediaFileId AND IsResolved = 0 ORDER BY Id LIMIT 1", item);
+        if (existingId.HasValue)
+        {
+            item.Id = existingId.Value;
+            await conn.ExecuteAsync("UPDATE ReviewItems SET Reason = @Reason, CandidateMatchesJson = @CandidateMatchesJson WHERE Id = @Id", item);
+            return item.Id;
+        }
         var id = await conn.ExecuteScalarAsync<int>(@"
             INSERT INTO ReviewItems (MediaFileId, Reason, CandidateMatchesJson, CreatedUtc, IsResolved)
             VALUES (@MediaFileId, @Reason, @CandidateMatchesJson, @CreatedUtc, @IsResolved);

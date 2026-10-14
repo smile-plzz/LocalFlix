@@ -20,6 +20,12 @@ public class FileScanner : IFileScanner
         ".ts", ".m2ts", ".webm", ".mpg", ".mpeg"
     };
 
+    public bool IsPaused { get; set; }
+    private async Task WaitIfPausedAsync(CancellationToken token)
+    {
+        while (IsPaused) await Task.Delay(100, token);
+        token.ThrowIfCancellationRequested();
+    }
     private readonly ILibraryRepository _repository;
     private readonly IFilenameParser _parser;
     private readonly IMediaClassifier _classifier;
@@ -47,6 +53,7 @@ public class FileScanner : IFileScanner
         {
             cancellationToken.ThrowIfCancellationRequested();
 
+            await WaitIfPausedAsync(cancellationToken);
             var currentDir = dirQueue.Dequeue();
 
             string[] subDirs;
@@ -66,6 +73,12 @@ public class FileScanner : IFileScanner
                 {
                     continue;
                 }
+                try
+                {
+                    if ((File.GetAttributes(sub) & (FileAttributes.Hidden | FileAttributes.System | FileAttributes.ReparsePoint)) != 0) continue;
+                }
+                catch (IOException) { continue; }
+                catch (UnauthorizedAccessException) { continue; }
                 dirQueue.Enqueue(sub);
             }
 
@@ -81,6 +94,13 @@ public class FileScanner : IFileScanner
 
             foreach (var file in files)
             {
+                cancellationToken.ThrowIfCancellationRequested();
+                try
+                {
+                    if ((File.GetAttributes(file) & (FileAttributes.Hidden | FileAttributes.System | FileAttributes.ReparsePoint)) != 0) continue;
+                }
+                catch (IOException) { continue; }
+                catch (UnauthorizedAccessException) { continue; }
                 var ext = Path.GetExtension(file);
                 if (VideoExtensions.Contains(ext))
                 {
@@ -108,21 +128,27 @@ public class FileScanner : IFileScanner
 
         await foreach (var file in DiscoverFilesAsync(rootPath, cancellationToken))
         {
+            await WaitIfPausedAsync(cancellationToken);
             discovered++;
             cancellationToken.ThrowIfCancellationRequested();
 
             var fileInfo = new FileInfo(file);
-            if (_classifier.IsNoise(file, fileInfo.Length))
+            long fileSize;
+            DateTime modified;
+            try { fileSize = fileInfo.Length; modified = fileInfo.LastWriteTimeUtc; }
+            catch (IOException) { continue; }
+            catch (UnauthorizedAccessException) { continue; }
+            if (_classifier.IsNoise(file, fileSize))
             {
                 continue;
             }
 
-            var relativePath = Path.GetRelativePath(rootPath, file);
+            var relativePath = Path.GetRelativePath(Path.GetPathRoot(Path.GetFullPath(rootPath))!, file);
             var parentDir = Path.GetFileName(Path.GetDirectoryName(file));
 
             // Incremental rescan check: if existing file has same size and modified date, skip reprocessing
             var existing = await _repository.GetMediaFileByRelativePathAsync(driveId, relativePath);
-            if (existing != null && existing.FileSizeBytes == fileInfo.Length && existing.DateModifiedUtc == fileInfo.LastWriteTimeUtc)
+            if (existing != null && existing.FileSizeBytes == fileSize && existing.DateModifiedUtc == modified)
             {
                 processed++;
                 progress?.Report(new ScanProgress(file, discovered, processed, matched, needingReview, "Skipping unchanged file"));
@@ -130,7 +156,7 @@ public class FileScanner : IFileScanner
             }
 
             var parsed = _parser.Parse(fileInfo.Name, parentDir);
-            var classification = _classifier.Classify(file, fileInfo.Length, 0, parsed);
+            var classification = _classifier.Classify(file, fileSize, 0, parsed);
 
             var mediaFile = existing ?? new MediaFile
             {
@@ -138,8 +164,8 @@ public class FileScanner : IFileScanner
                 RelativePath = relativePath
             };
 
-            mediaFile.FileSizeBytes = fileInfo.Length;
-            mediaFile.DateModifiedUtc = fileInfo.LastWriteTimeUtc;
+            mediaFile.FileSizeBytes = fileSize;
+            mediaFile.DateModifiedUtc = modified;
             mediaFile.Classification = classification;
             mediaFile.VideoCodec = parsed.VideoCodec ?? string.Empty;
             mediaFile.AudioCodec = parsed.AudioCodec ?? string.Empty;
@@ -149,7 +175,7 @@ public class FileScanner : IFileScanner
                 mediaFile.Status = FileStatus.Excluded;
                 var fileId = await _repository.UpsertMediaFileAsync(mediaFile);
 
-                _classifier.IsPersonalVideo(file, fileInfo.Length, 0, parsed, out var reason);
+                _classifier.IsPersonalVideo(file, fileSize, 0, parsed, out var reason);
                 await _repository.UpsertReviewItemAsync(new ReviewItem
                 {
                     MediaFileId = fileId,

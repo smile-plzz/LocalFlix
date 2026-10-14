@@ -23,9 +23,13 @@ public partial class SettingsView : UserControl
 
     private void LoadSettings()
     {
-        TmdbKeyBox.Text = Environment.GetEnvironmentVariable("TMDB_API_KEY") ?? string.Empty;
-        OmdbKeyBox.Text = Environment.GetEnvironmentVariable("OMDB_API_KEY") ?? string.Empty;
+        TmdbKeyBox.Text = Environment.GetEnvironmentVariable("TMDB_API_KEY", EnvironmentVariableTarget.User) ?? Environment.GetEnvironmentVariable("TMDB_API_KEY") ?? string.Empty;
+        OmdbKeyBox.Text = Environment.GetEnvironmentVariable("OMDB_API_KEY", EnvironmentVariableTarget.User) ?? Environment.GetEnvironmentVariable("OMDB_API_KEY") ?? string.Empty;
 
+        var preferences = PlaybackPreferences.Load();
+        HardwareAccToggle.IsChecked = preferences.HardwareAcceleration;
+        AutoPlayNextToggle.IsChecked = preferences.AutoPlayNext;
+        SubtitleLangCombo.SelectedItem = SubtitleLangCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(i => (string)i.Content == preferences.SubtitleLanguage);
         var cacheDir = _imageCache.GetLocalCacheDirectory();
         CachePathText.Text = cacheDir;
         UpdateCacheSizeDisplay(cacheDir);
@@ -53,6 +57,17 @@ public partial class SettingsView : UserControl
         }
     }
 
+    private void SavePlaybackButton_Click(object sender, RoutedEventArgs e)
+    {
+        new PlaybackPreferences
+        {
+            SubtitleLanguage = (SubtitleLangCombo.SelectedItem as ComboBoxItem)?.Content?.ToString() ?? "English",
+            HardwareAcceleration = HardwareAccToggle.IsChecked == true,
+            AutoPlayNext = AutoPlayNextToggle.IsChecked == true
+        }.Save();
+        MessageBox.Show("Playback preferences saved. They apply to the next video.", "Settings");
+    }
+
     private void SaveKeysButton_Click(object sender, RoutedEventArgs e)
     {
         Environment.SetEnvironmentVariable("TMDB_API_KEY", TmdbKeyBox.Text.Trim(), EnvironmentVariableTarget.User);
@@ -62,6 +77,10 @@ public partial class SettingsView : UserControl
 
     private void ClearCacheButton_Click(object sender, RoutedEventArgs e)
     {
+        var preferences = PlaybackPreferences.Load();
+        HardwareAccToggle.IsChecked = preferences.HardwareAcceleration;
+        AutoPlayNextToggle.IsChecked = preferences.AutoPlayNext;
+        SubtitleLangCombo.SelectedItem = SubtitleLangCombo.Items.Cast<ComboBoxItem>().FirstOrDefault(i => (string)i.Content == preferences.SubtitleLanguage);
         var cacheDir = _imageCache.GetLocalCacheDirectory();
         if (Directory.Exists(cacheDir))
         {
@@ -99,7 +118,11 @@ public partial class SettingsView : UserControl
         {
             try
             {
-                File.Copy(dbPath, saveDialog.FileName, true);
+                using var source = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={dbPath}");
+                using var destination = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={saveDialog.FileName}");
+                source.Open();
+                destination.Open();
+                source.BackupDatabase(destination);
                 MessageBox.Show("Database backed up successfully!", "Backup Complete", MessageBoxButton.OK, MessageBoxImage.Information);
             }
             catch (Exception ex)
