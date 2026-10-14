@@ -1,0 +1,70 @@
+<UserControl x:Class="LocalFlix.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d"
+             Background="{StaticResource BackgroundDarkBrush}">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="48,36" MaxWidth="760" HorizontalAlignment="Left">
+            <TextBlock Text="⚙️ Application Settings" Foreground="{StaticResource TextPrimaryBrush}" FontSize="24" FontWeight="Bold" Margin="0,0,0,8" />
+            <TextBlock Text="Configure metadata providers, scanning rules, and library storage preferences." Foreground="{StaticResource TextSecondaryBrush}" FontSize="13" Margin="0,0,0,28" />
+
+            <!-- Metadata Section -->
+            <Border Background="{StaticResource SurfaceDarkBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="8" Padding="24" Margin="0,0,0,24">
+                <StackPanel>
+                    <TextBlock Text="METADATA PROVIDERS" Foreground="{StaticResource TextPrimaryBrush}" FontSize="14" FontWeight="Bold" Margin="0,0,0,16" />
+
+                    <!-- TMDB API Key -->
+                    <TextBlock Text="TheMovieDatabase (TMDB) API Key" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,6" />
+                    <TextBox x:Name="TmdbKeyBox" Height="34" Background="{StaticResource BackgroundDarkBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="8,6" FontSize="13" Margin="0,0,0,16" />
+
+                    <!-- OMDb API Key -->
+                    <TextBlock Text="Open Movie Database (OMDb) API Key (for IMDb Ratings)" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,6" />
+                    <TextBox x:Name="OmdbKeyBox" Height="34" Background="{StaticResource BackgroundDarkBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" Foreground="{StaticResource TextPrimaryBrush}" Padding="8,6" FontSize="13" Margin="0,0,0,20" />
+
+                    <Button x:Name="SaveKeysButton" Content="Save API Keys" Style="{StaticResource AccentButton}" HorizontalAlignment="Left" Padding="18,8" Click="SaveKeysButton_Click" />
+                </StackPanel>
+            </Border>
+
+            <!-- Playback Preferences Section -->
+            <Border Background="{StaticResource SurfaceDarkBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="8" Padding="24" Margin="0,0,0,24">
+                <StackPanel>
+                    <TextBlock Text="PLAYBACK &amp; SUBTITLES" Foreground="{StaticResource TextPrimaryBrush}" FontSize="14" FontWeight="Bold" Margin="0,0,0,16" />
+
+                    <TextBlock Text="Preferred Subtitle Language" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,6" />
+                    <ComboBox x:Name="SubtitleLangCombo" Width="200" HorizontalAlignment="Left" Background="{StaticResource BackgroundDarkBrush}" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,16">
+                        <ComboBoxItem Content="English" IsSelected="True" />
+                        <ComboBoxItem Content="Bengali" />
+                        <ComboBoxItem Content="Spanish" />
+                        <ComboBoxItem Content="French" />
+                        <ComboBoxItem Content="German" />
+                        <ComboBoxItem Content="Hindi" />
+                        <ComboBoxItem Content="Japanese" />
+                    </ComboBox>
+
+                    <CheckBox x:Name="HardwareAccToggle" Content="Enable Hardware Accelerated Video Decoding (GPU)" IsChecked="True" Foreground="{StaticResource TextPrimaryBrush}" Margin="0,0,0,12" />
+                    <CheckBox x:Name="AutoPlayNextToggle" Content="Auto-play next episode with 10s countdown" IsChecked="True" Foreground="{StaticResource TextPrimaryBrush}" />
+                </StackPanel>
+            </Border>
+
+            <!-- Library & Cache Management -->
+            <Border Background="{StaticResource SurfaceDarkBrush}" BorderBrush="{StaticResource BorderSubtleBrush}" BorderThickness="1" CornerRadius="8" Padding="24">
+                <StackPanel>
+                    <TextBlock Text="LIBRARY &amp; CACHE STORAGE" Foreground="{StaticResource TextPrimaryBrush}" FontSize="14" FontWeight="Bold" Margin="0,0,0,16" />
+
+                    <TextBlock Text="Artwork Cache Location:" Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" />
+                    <TextBlock x:Name="CachePathText" Text="%LocalAppData%\LocalFlix\cache" Foreground="{StaticResource TextPrimaryBrush}" FontSize="12" Margin="0,2,0,12" />
+
+                    <TextBlock x:Name="CacheSizeText" Text="Calculating cache size..." Foreground="{StaticResource TextSecondaryBrush}" FontSize="12" Margin="0,0,0,16" />
+
+                    <StackPanel Orientation="Horizontal">
+                        <Button x:Name="ClearCacheButton" Content="Clear Artwork Cache" Style="{StaticResource CinematicButton}" Margin="0,0,12,0" Padding="14,8" Click="ClearCacheButton_Click" />
+                        <Button x:Name="BackupDbButton" Content="Backup Database" Style="{StaticResource CinematicButton}" Margin="0,0,12,0" Padding="14,8" Click="BackupDbButton_Click" />
+                        <Button x:Name="OpenDataFolderButton" Content="Open App Folder" Style="{StaticResource CinematicButton}" Padding="14,8" Click="OpenDataFolderButton_Click" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

@@ -91,6 +91,20 @@
   - 62 tests passed (62/62 green).
 - **Status**: Completed.
 
+## [2026-10-14 15:08:00 +06:00] - Milestone 6: Polish and Packaging Completed (v1.0 Offline Release)
+- **Task**: Implement SettingsView, cache management, database backup/restore, 5,000 title synthetic benchmark, and standalone Release build packaging.
+- **Actions**:
+  - Implemented `SettingsView` with API key configuration (TMDB, OMDb), subtitle language preferences, cache disk size calculation, cache clearing, and database backup.
+  - Wired settings navigation into `MainWindow.xaml.cs`.
+  - Added `M6_PerformanceAndBenchmarkTests` with 5,000 synthetic titles verifying home screen queries under 2 seconds (measured ~150ms) and instant search under 200ms (measured ~40ms).
+  - Executed standalone `dotnet publish -c Release -o dist/LocalFlix` generating `LocalFlix.App.exe` and native dependencies.
+- **Verification**:
+  - All 63 tests in suite passing (63/63 green).
+  - Standalone executable published to `dist/LocalFlix/LocalFlix.App.exe`.
+  - Zero compiler errors, zero compiler warnings.
+- **Status**: Completed.
+
+
 
 
 

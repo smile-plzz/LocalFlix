@@ -154,6 +154,10 @@ public partial class MainWindow : Window
                 MainContentHost.Content = _needsReviewView;
                 break;
 
+            case "Settings":
+                MainContentHost.Content = new SettingsView(_imageCache);
+                break;
+
             default:
                 var panel = new StackPanel
                 {

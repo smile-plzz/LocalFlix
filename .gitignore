@@ -9,6 +9,8 @@ _ReSharper*/
 *.suo
 *.userprefs
 TestResults/
+dist/
+publish/
 *.db
 *.bak
 *.sqlite
