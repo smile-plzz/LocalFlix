@@ -1,32 +1,32 @@
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.env
-.venv/
-env/
-venv/
-ENV/
+## .NET
+[Bb]in/
+[Oo]bj/
+*.user
+*.userosscache
+*.sln.docstates
+.vs/
+_ReSharper*/
+*.suo
+*.userprefs
+TestResults/
+*.db
+*.bak
+*.sqlite
+*.sqlite3
 
-# Node
-node_modules/
-dist/
-.npm/
-
-# IDE / Editor
+## IDE / Editor
 .vscode/
 .idea/
 *.swp
 *.swo
 *~
 
-# Local Media & Cache (Do not commit media libraries)
+## Local Media & Cache (Do not commit user media)
 media/
 videos/
+cache/
 *.mp4
 *.mkv
 *.avi
 *.mov
 *.webm
-*.sqlite3
-*.db
